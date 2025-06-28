@@ -1,0 +1,635 @@
+{
+  "collection": {
+    "info": {
+      "_postman_id": "explore-with-me-stats",
+      "name": "ExploreWithMe Stats Service",
+      "description": "",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Stats Service Tests",
+        "item": [
+          {
+            "name": "1. Save Hit - Valid Request",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/hit",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "hit"
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 201\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(201);",
+                    "});",
+                    "",
+                    "pm.test(\"Response time is less than 1000ms\", function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                    "});",
+                    "",
+                    "pm.test(\"Response has correct Content-Type\", function () {",
+                    "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                    "});",
+                    "",
+                    "pm.test(\"Response body is not empty\", function () {",
+                    "    pm.expect(pm.response.text()).to.not.be.empty;",
+                    "});",
+                    "",
+                    "pm.test(\"Response has EndpointHitResponse structure\", function () {",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response).to.have.property('id');",
+                    "    pm.expect(response).to.have.property('app');",
+                    "    pm.expect(response).to.have.property('uri');",
+                    "    pm.expect(response).to.have.property('ip');",
+                    "    pm.expect(response).to.have.property('timestamp');",
+                    "    pm.expect(response.app).to.equal('ewm-main-service');",
+                    "    pm.expect(response.uri).to.equal('/events/1');",
+                    "    pm.expect(response.ip).to.equal('192.168.1.1');",
+                    "});",
+                    "",
+                    "if (pm.response.code === 201) {",
+                    "    pm.collectionVariables.set(\"lastHitId\", pm.response.json().id);",
+                    "}"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "2. Save Hit - Invalid Request (Missing App)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/hit",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "hit"
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 400 for invalid request\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(400);",
+                    "});",
+                    "",
+                    "pm.test(\"Response contains error message\", function () {",
+                    "    const responseBody = pm.response.json();",
+                    "    pm.expect(responseBody).to.have.property('message');",
+                    "    pm.expect(responseBody.message).to.not.be.empty;",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "3. Save Hit - Invalid Request (Invalid Timestamp)",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"invalid-date\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/hit",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "hit"
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 400 for invalid timestamp\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(400);",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "4. Get Stats - Basic Request",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ],
+                "query": [
+                  {
+                    "key": "start",
+                    "value": "2024-01-01 00:00:00"
+                  },
+                  {
+                    "key": "end",
+                    "value": "2024-12-31 23:59:59"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response is an array\", function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                    "});",
+                    "",
+                    "pm.test(\"Response time is less than 1000ms\", function () {",
+                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                    "});",
+                    "",
+                    "pm.test(\"Each item has required properties\", function () {",
+                    "    const response = pm.response.json();",
+                    "    if (response.length > 0) {",
+                    "        response.forEach(item => {",
+                    "            pm.expect(item).to.have.property('app');",
+                    "            pm.expect(item).to.have.property('uri');",
+                    "            pm.expect(item).to.have.property('hits');",
+                    "            pm.expect(item.hits).to.be.a('number');",
+                    "        });",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "5. Get Stats - With URIs Filter",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&uris=/events/1&uris=/events/2",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ],
+                "query": [
+                  {
+                    "key": "start",
+                    "value": "2024-01-01 00:00:00"
+                  },
+                  {
+                    "key": "end",
+                    "value": "2024-12-31 23:59:59"
+                  },
+                  {
+                    "key": "uris",
+                    "value": "/events/1"
+                  },
+                  {
+                    "key": "uris",
+                    "value": "/events/2"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response is an array\", function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                    "});",
+                    "",
+                    "pm.test(\"All returned URIs match requested ones\", function () {",
+                    "    const response = pm.response.json();",
+                    "    const requestedUris = ['/events/1', '/events/2'];",
+                    "    response.forEach(item => {",
+                    "        pm.expect(requestedUris).to.include(item.uri);",
+                    "    });",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "6. Get Stats - Unique Hits",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&unique=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ],
+                "query": [
+                  {
+                    "key": "start",
+                    "value": "2024-01-01 00:00:00"
+                  },
+                  {
+                    "key": "end",
+                    "value": "2024-12-31 23:59:59"
+                  },
+                  {
+                    "key": "unique",
+                    "value": "true"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response is an array\", function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                    "});",
+                    "",
+                    "pm.test(\"Each item has required properties\", function () {",
+                    "    const response = pm.response.json();",
+                    "    if (response.length > 0) {",
+                    "        response.forEach(item => {",
+                    "            pm.expect(item).to.have.property('app');",
+                    "            pm.expect(item).to.have.property('uri');",
+                    "            pm.expect(item).to.have.property('hits');",
+                    "            pm.expect(item.hits).to.be.a('number');",
+                    "            pm.expect(item.hits).to.be.at.least(0);",
+                    "        });",
+                    "    }",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "7. Get Stats - Complete Flow Test",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&uris=/events/1&unique=true",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ],
+                "query": [
+                  {
+                    "key": "start",
+                    "value": "2024-01-01 00:00:00"
+                  },
+                  {
+                    "key": "end",
+                    "value": "2024-12-31 23:59:59"
+                  },
+                  {
+                    "key": "uris",
+                    "value": "/events/1"
+                  },
+                  {
+                    "key": "unique",
+                    "value": "true"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response is an array\", function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('array');",
+                    "});",
+                    "",
+                    "pm.test(\"All returned URIs match requested URI\", function () {",
+                    "    const response = pm.response.json();",
+                    "    response.forEach(item => {",
+                    "        pm.expect(item.uri).to.equal('/events/1');",
+                    "    });",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "8. Get Stats - Invalid Date Range",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats?start=2024-12-31 23:59:59&end=2024-01-01 00:00:00",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ],
+                "query": [
+                  {
+                    "key": "start",
+                    "value": "2024-12-31 23:59:59"
+                  },
+                  {
+                    "key": "end",
+                    "value": "2024-01-01 00:00:00"
+                  }
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 400 for invalid date range\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(400);",
+                    "});",
+                    "",
+                    "pm.test(\"Response contains ErrorResponse structure\", function () {",
+                    "    const responseBody = pm.response.json();",
+                    "    pm.expect(responseBody).to.have.property('message');",
+                    "    pm.expect(responseBody).to.have.property('timestamp');",
+                    "    pm.expect(responseBody).to.have.property('status');",
+                    "    pm.expect(responseBody.message).to.equal('Start date must be before end date');",
+                    "    pm.expect(responseBody.status).to.equal(400);",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "9. Get Stats - Missing Required Parameters",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/stats",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "stats"
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 400 for missing parameters\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(400);",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "10. Health Check",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/actuator/health",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "actuator",
+                  "health"
+                ]
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.expect(pm.response.code).to.equal(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Health check response structure\", function () {",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response).to.have.property('status');",
+                    "    pm.expect(response.status).to.be.oneOf(['UP', 'DOWN']);",
+                    "});",
+                    "",
+                    "pm.test(\"Service is UP\", function () {",
+                    "    const response = pm.response.json();",
+                    "    pm.expect(response.status).to.equal('UP');",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "console.log('Starting request to: ' + pm.request.url);"
+          ]
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "pm.test(\"Response time is reasonable\", function () {",
+            "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+            "});",
+            "",
+            "pm.test(\"Response has valid JSON\", function () {",
+            "    if (pm.response.headers.get(\"Content-Type\") && pm.response.headers.get(\"Content-Type\").includes(\"application/json\")) {",
+            "        pm.expect(() => pm.response.json()).to.not.throw();",
+            "    }",
+            "});"
+          ]
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:9090",
+        "type": "string"
+      }
+    ]
+  },
+  "environment": {
+    "id": "explore-with-me-env",
+    "name": "ExploreWithMe Environment",
+    "values": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:9090",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "statsServiceUrl",
+        "value": "http://localhost:9090",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "mainServiceUrl",
+        "value": "http://localhost:8080",
+        "type": "default",
+        "enabled": true
+      }
+    ],
+    "_postman_variable_scope": "environment",
+    "_postman_exported_at": "2024-01-01T00:00:00.000Z",
+    "_postman_exported_using": "Postman/10.0.0"
+  },
+  "metadata": {
+    "description": "Postman тесты для сервиса статистики ExploreWithMe с полным набором тестов и DTO",
+    "version": "3.0.0",
+    "author": "ExploreWithMe Team",
+    "setup": [
+      "1. Импортируйте этот файл в Postman",
+      "2. Выберите environment 'ExploreWithMe Environment'",
+      "3. Запустите сервис статистики: mvn spring-boot:run -pl ewm-stats-service/ewm-stats-service -Dspring-boot.run.profiles=dev",
+      "4. Выполните тесты в порядке: сначала Save Hit, затем Get Stats"
+    ],
+    "testScenarios": {
+      "Valid Requests": [
+        "Save Hit - Valid Request",
+        "Get Stats - Basic Request",
+        "Get Stats - With URIs Filter",
+        "Get Stats - Unique Hits",
+        "Get Stats - Complete Flow Test",
+        "Health Check"
+      ],
+      "Error Handling": [
+        "Save Hit - Invalid Request (Missing App)",
+        "Save Hit - Invalid Request (Invalid Timestamp)",
+        "Get Stats - Invalid Date Range",
+        "Get Stats - Missing Required Parameters"
+      ]
+    },
+    "endpoints": {
+      "POST /hit": "Сохранение информации о запросе к эндпоинту",
+      "GET /stats": "Получение статистики за период",
+      "GET /actuator/health": "Проверка состояния сервиса"
+    },
+    "testCoverage": {
+      "Positive Testing": "Проверка корректных запросов и ответов",
+      "Negative Testing": "Проверка обработки ошибок и валидации",
+      "Performance Testing": "Проверка времени ответа",
+      "Data Validation": "Проверка структуры и типов данных в ответах",
+      "DTO Validation": "Проверка структуры DTO классов"
+    },
+    "dtoClasses": {
+      "EndpointHitResponse": "DTO для ответа при сохранении hit",
+      "ErrorResponse": "DTO для ответов с ошибками",
+      "ViewStats": "DTO для статистики просмотров"
+    }
+  }
+} 
