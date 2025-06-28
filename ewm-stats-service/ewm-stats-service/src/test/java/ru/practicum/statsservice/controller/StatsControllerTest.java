@@ -155,4 +155,36 @@ class StatsControllerTest {
                         .param("end", "2023-01-02 00:00:00"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void getStats_WithEncodedParameters_ShouldWorkCorrectly() throws Exception {
+        List<ViewStats> expectedStats = Arrays.asList(
+                ViewStats.builder()
+                        .app("test-app")
+                        .uri("/events/1")
+                        .hits(5L)
+                        .build()
+        );
+
+        when(statsService.handleGetStats(anyString(), anyString(), anyList(), anyBoolean()))
+                .thenReturn(expectedStats);
+
+        mockMvc.perform(get("/stats")
+                        .param("start", "2023-01-01%2000%3A00%3A00")
+                        .param("end", "2023-01-02%2000%3A00%3A00")
+                        .param("uris", "/events%2F1")
+                        .param("unique", "false"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].app").value("test-app"))
+                .andExpect(jsonPath("$[0].uri").value("/events/1"))
+                .andExpect(jsonPath("$[0].hits").value(5));
+
+        verify(statsService, times(1)).handleGetStats(
+                eq("2023-01-01%2000%3A00%3A00"),
+                eq("2023-01-02%2000%3A00%3A00"),
+                eq(Arrays.asList("/events%2F1")),
+                eq(false)
+        );
+    }
 }

@@ -280,4 +280,30 @@ class StatsServiceTest {
         assertThrows(StatsServiceException.class, () ->
                 statsService.handleGetStats("2023-01-01 00:00:00", "2023-01-02 00:00:00", Arrays.asList("/test"), false));
     }
+
+    @Test
+    void handleGetStats_WithEncodedDateTime_ShouldWorkCorrectly() {
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{"test-app", "/test", 10L});
+
+        when(repository.getStats(any(LocalDateTime.class), any(LocalDateTime.class), any()))
+                .thenReturn(mockResults);
+
+        List<ViewStats> result = statsService.handleGetStats(
+                "2023-01-01%2000%3A00%3A00",
+                "2023-01-02%2000%3A00%3A00",
+                Arrays.asList("/test"),
+                false
+        );
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(10L, result.get(0).getHits());
+    }
+
+    @Test
+    void handleGetStats_WithInvalidEncodedDateTime_ShouldThrowBadRequestException() {
+        assertThrows(BadRequestException.class, () ->
+                statsService.handleGetStats("invalid%20encoded%20date", "2023-01-02 00:00:00", Arrays.asList("/test"), false));
+    }
 }
