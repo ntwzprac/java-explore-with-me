@@ -1,6 +1,7 @@
 package ru.practicum.statsservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsdto.EndpointHit;
@@ -19,11 +20,15 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class StatsServiceImpl implements StatsService {
     private final EndpointHitRepository repository;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Autowired
+    public StatsServiceImpl(EndpointHitRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public void saveHit(EndpointHit hit) {
