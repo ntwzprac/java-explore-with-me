@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,17 +37,22 @@ public class StatsClient {
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         StringBuilder url = new StringBuilder(baseUrl + "/stats?");
-        url.append("start=").append(start.format(FORMATTER));
-        url.append("&end=").append(end.format(FORMATTER));
 
-        if (uris != null && !uris.isEmpty()) {
-            for (String uri : uris) {
-                url.append("&uris=").append(uri);
+        try {
+            url.append("start=").append(URLEncoder.encode(start.format(FORMATTER), StandardCharsets.UTF_8));
+            url.append("&end=").append(URLEncoder.encode(end.format(FORMATTER), StandardCharsets.UTF_8));
+
+            if (uris != null && !uris.isEmpty()) {
+                for (String uri : uris) {
+                    url.append("&uris=").append(URLEncoder.encode(uri, StandardCharsets.UTF_8));
+                }
             }
-        }
 
-        if (unique) {
-            url.append("&unique=true");
+            if (unique) {
+                url.append("&unique=true");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error encoding URL parameters", e);
         }
 
         ResponseEntity<ViewStats[]> response = restTemplate.getForEntity(url.toString(), ViewStats[].class);
