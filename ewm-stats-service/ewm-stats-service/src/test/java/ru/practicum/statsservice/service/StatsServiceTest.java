@@ -139,21 +139,21 @@ class StatsServiceTest {
 
     @Test
     void getStats_WithInvalidDateRange_ShouldThrowBadRequestException() {
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
                 statsService.getStats(endDate, startDate, Arrays.asList("/test"), false));
-        
+
         verify(repository, never()).getStats(any(), any(), any());
         verify(repository, never()).getStatsUnique(any(), any(), any());
     }
 
     @Test
     void getStats_WithNullDates_ShouldThrowBadRequestException() {
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
                 statsService.getStats(null, endDate, Arrays.asList("/test"), false));
-        
-        assertThrows(BadRequestException.class, () -> 
+
+        assertThrows(BadRequestException.class, () ->
                 statsService.getStats(startDate, null, Arrays.asList("/test"), false));
-        
+
         verify(repository, never()).getStats(any(), any(), any());
         verify(repository, never()).getStatsUnique(any(), any(), any());
     }
@@ -165,16 +165,16 @@ class StatsServiceTest {
 
     @Test
     void validateDateRange_WithInvalidRange_ShouldThrowBadRequestException() {
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
                 statsService.validateDateRange(endDate, startDate));
     }
 
     @Test
     void validateDateRange_WithNullDates_ShouldThrowBadRequestException() {
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
                 statsService.validateDateRange(null, endDate));
-        
-        assertThrows(BadRequestException.class, () -> 
+
+        assertThrows(BadRequestException.class, () ->
                 statsService.validateDateRange(startDate, null));
     }
 
@@ -239,9 +239,9 @@ class StatsServiceTest {
                 .thenReturn(mockResults);
 
         List<ViewStats> result = statsService.handleGetStats(
-                "2023-01-01 00:00:00", 
-                "2023-01-02 00:00:00", 
-                Arrays.asList("/test"), 
+                "2023-01-01 00:00:00",
+                "2023-01-02 00:00:00",
+                Arrays.asList("/test"),
                 false
         );
 
@@ -252,7 +252,7 @@ class StatsServiceTest {
 
     @Test
     void handleGetStats_WithInvalidDateFormat_ShouldThrowBadRequestException() {
-        assertThrows(BadRequestException.class, () -> 
+        assertThrows(BadRequestException.class, () ->
                 statsService.handleGetStats("invalid-date", "2023-01-02 00:00:00", Arrays.asList("/test"), false));
     }
 
@@ -261,7 +261,7 @@ class StatsServiceTest {
         when(repository.getStats(any(LocalDateTime.class), any(LocalDateTime.class), any()))
                 .thenThrow(new RuntimeException("DB Error"));
 
-        assertThrows(StatsServiceException.class, () -> 
+        assertThrows(StatsServiceException.class, () ->
                 statsService.handleGetStats("2023-01-01 00:00:00", "2023-01-02 00:00:00", Arrays.asList("/test"), false));
     }
-} 
+}

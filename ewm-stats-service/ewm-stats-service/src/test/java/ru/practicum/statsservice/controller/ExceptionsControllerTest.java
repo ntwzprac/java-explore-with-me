@@ -35,7 +35,7 @@ class ExceptionsControllerTest {
     void handleBadRequest_ShouldReturnBadRequestStatus() {
         BadRequestException exception = new BadRequestException("Test bad request error");
 
-        ResponseEntity<ErrorResponse> response = 
+        ResponseEntity<ErrorResponse> response =
                 exceptionsController.handleBadRequest(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -47,7 +47,7 @@ class ExceptionsControllerTest {
     void handleServiceException_ShouldReturnInternalServerErrorStatus() {
         StatsServiceException exception = new StatsServiceException("Test service error");
 
-        ResponseEntity<ErrorResponse> response = 
+        ResponseEntity<ErrorResponse> response =
                 exceptionsController.handleServiceException(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -59,7 +59,7 @@ class ExceptionsControllerTest {
     void handleOther_ShouldReturnInternalServerErrorStatus() {
         RuntimeException exception = new RuntimeException("Test generic error");
 
-        ResponseEntity<ErrorResponse> response = 
+        ResponseEntity<ErrorResponse> response =
                 exceptionsController.handleOther(exception);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -69,11 +69,11 @@ class ExceptionsControllerTest {
 
     @Test
     void handleValidationException_ShouldReturnBadRequestStatus() {
-        org.springframework.web.bind.MethodArgumentNotValidException exception = 
+        org.springframework.web.bind.MethodArgumentNotValidException exception =
                 mock(org.springframework.web.bind.MethodArgumentNotValidException.class);
-        org.springframework.validation.BindingResult bindingResult = 
+        org.springframework.validation.BindingResult bindingResult =
                 mock(org.springframework.validation.BindingResult.class);
-        org.springframework.validation.FieldError fieldError = 
+        org.springframework.validation.FieldError fieldError =
                 mock(org.springframework.validation.FieldError.class);
 
         when(exception.getBindingResult()).thenReturn(bindingResult);
@@ -81,7 +81,7 @@ class ExceptionsControllerTest {
         when(fieldError.getField()).thenReturn("testField");
         when(fieldError.getDefaultMessage()).thenReturn("Test validation error");
 
-        ResponseEntity<ErrorResponse> response = 
+        ResponseEntity<ErrorResponse> response =
                 exceptionsController.handleValidationException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -91,14 +91,14 @@ class ExceptionsControllerTest {
 
     @Test
     void handleMissingServletRequestParameterException_ShouldReturnBadRequestStatus() {
-        org.springframework.web.bind.MissingServletRequestParameterException exception = 
+        org.springframework.web.bind.MissingServletRequestParameterException exception =
                 new org.springframework.web.bind.MissingServletRequestParameterException("testParam", "String");
 
-        ResponseEntity<ErrorResponse> response = 
+        ResponseEntity<ErrorResponse> response =
                 exceptionsController.handleMissingServletRequestParameterException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Required request parameter 'testParam' is not present", response.getBody().getMessage());
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getBody().getStatus());
     }
-} 
+}

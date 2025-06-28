@@ -79,11 +79,11 @@ class EndpointHitRepositoryTest {
         List<Object[]> results = repository.getStats(startDate, endDate, uris);
 
         assertEquals(2, results.size());
-        
+
         assertEquals("test-app", results.get(0)[0]);
         assertEquals("/test1", results.get(0)[1]);
         assertEquals(2L, results.get(0)[2]);
-        
+
         assertEquals("test-app", results.get(1)[0]);
         assertEquals("/test2", results.get(1)[1]);
         assertEquals(1L, results.get(1)[2]);
@@ -96,11 +96,11 @@ class EndpointHitRepositoryTest {
         List<Object[]> results = repository.getStatsUnique(startDate, endDate, uris);
 
         assertEquals(2, results.size());
-        
+
         assertEquals("test-app", results.get(0)[0]);
         assertEquals("/test1", results.get(0)[1]);
         assertEquals(2L, results.get(0)[2]);
-        
+
         assertEquals("test-app", results.get(1)[0]);
         assertEquals("/test2", results.get(1)[1]);
         assertEquals(1L, results.get(1)[2]);
@@ -138,4 +138,4 @@ class EndpointHitRepositoryTest {
 
         assertTrue(results.isEmpty());
     }
-} 
+}

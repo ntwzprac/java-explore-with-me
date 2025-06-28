@@ -14,7 +14,6 @@ import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
 import ru.practicum.statsservice.service.StatsService;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -155,4 +154,4 @@ class StatsControllerTest {
                         .param("end", "2023-01-02 00:00:00"))
                 .andExpect(status().isBadRequest());
     }
-} 
+}
