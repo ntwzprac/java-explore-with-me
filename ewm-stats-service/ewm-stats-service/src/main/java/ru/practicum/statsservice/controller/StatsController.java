@@ -1,5 +1,6 @@
 package ru.practicum.statsservice.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,6 @@ import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
 import ru.practicum.statsservice.service.StatsService;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
