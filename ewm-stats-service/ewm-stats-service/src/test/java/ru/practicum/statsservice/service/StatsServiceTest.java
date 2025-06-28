@@ -138,6 +138,22 @@ class StatsServiceTest {
     }
 
     @Test
+    void getStats_WithEmptyUris_ShouldPassNullToRepository() {
+        List<Object[]> mockResults = new ArrayList<>();
+        mockResults.add(new Object[]{"test-app", "/test", 10L});
+
+        when(repository.getStats(any(LocalDateTime.class), any(LocalDateTime.class), isNull()))
+                .thenReturn(mockResults);
+
+        List<ViewStats> result = statsService.getStats(startDate, endDate, new ArrayList<>(), false);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        verify(repository, times(1)).getStats(startDate, endDate, null);
+    }
+
+    @Test
     void getStats_WithInvalidDateRange_ShouldThrowBadRequestException() {
         assertThrows(BadRequestException.class, () ->
                 statsService.getStats(endDate, startDate, Arrays.asList("/test"), false));

@@ -115,7 +115,7 @@ class EndpointHitRepositoryTest {
 
     @Test
     void getStats_WithEmptyUris_ShouldReturnAllStats() {
-        List<Object[]> results = repository.getStats(startDate, endDate, Arrays.asList());
+        List<Object[]> results = repository.getStats(startDate, endDate, null);
 
         assertEquals(2, results.size());
     }
