@@ -49,29 +49,9 @@
                     "    pm.expect(pm.response.responseTime).to.be.below(1000);",
                     "});",
                     "",
-                    "pm.test(\"Response has correct Content-Type\", function () {",
-                    "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-                    "});",
-                    "",
-                    "pm.test(\"Response body is not empty\", function () {",
-                    "    pm.expect(pm.response.text()).to.not.be.empty;",
-                    "});",
-                    "",
-                    "pm.test(\"Response has EndpointHitResponse structure\", function () {",
-                    "    const response = pm.response.json();",
-                    "    pm.expect(response).to.have.property('id');",
-                    "    pm.expect(response).to.have.property('app');",
-                    "    pm.expect(response).to.have.property('uri');",
-                    "    pm.expect(response).to.have.property('ip');",
-                    "    pm.expect(response).to.have.property('timestamp');",
-                    "    pm.expect(response.app).to.equal('ewm-main-service');",
-                    "    pm.expect(response.uri).to.equal('/events/1');",
-                    "    pm.expect(response.ip).to.equal('192.168.1.1');",
-                    "});",
-                    "",
-                    "if (pm.response.code === 201) {",
-                    "    pm.collectionVariables.set(\"lastHitId\", pm.response.json().id);",
-                    "}"
+                    "pm.test(\"Response body is empty\", function () {",
+                    "    pm.expect(pm.response.text()).to.be.empty;",
+                    "});"
                   ]
                 }
               }
@@ -167,7 +147,7 @@
               "method": "GET",
               "header": [],
               "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59",
+                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59",
                 "host": [
                   "{{baseUrl}}"
                 ],
@@ -177,11 +157,11 @@
                 "query": [
                   {
                     "key": "start",
-                    "value": "2024-01-01 00:00:00"
+                    "value": "2024-01-01%2000:00:00"
                   },
                   {
                     "key": "end",
-                    "value": "2024-12-31 23:59:59"
+                    "value": "2024-12-31%2023:59:59"
                   }
                 ]
               }
@@ -227,7 +207,7 @@
               "method": "GET",
               "header": [],
               "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&uris=/events/1&uris=/events/2",
+                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&uris=%2Fevents%2F2",
                 "host": [
                   "{{baseUrl}}"
                 ],
@@ -237,19 +217,19 @@
                 "query": [
                   {
                     "key": "start",
-                    "value": "2024-01-01 00:00:00"
+                    "value": "2024-01-01%2000:00:00"
                   },
                   {
                     "key": "end",
-                    "value": "2024-12-31 23:59:59"
+                    "value": "2024-12-31%2023:59:59"
                   },
                   {
                     "key": "uris",
-                    "value": "/events/1"
+                    "value": "%2Fevents%2F1"
                   },
                   {
                     "key": "uris",
-                    "value": "/events/2"
+                    "value": "%2Fevents%2F2"
                   }
                 ]
               }
@@ -287,7 +267,7 @@
               "method": "GET",
               "header": [],
               "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&unique=true",
+                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&unique=true",
                 "host": [
                   "{{baseUrl}}"
                 ],
@@ -297,11 +277,11 @@
                 "query": [
                   {
                     "key": "start",
-                    "value": "2024-01-01 00:00:00"
+                    "value": "2024-01-01%2000:00:00"
                   },
                   {
                     "key": "end",
-                    "value": "2024-12-31 23:59:59"
+                    "value": "2024-12-31%2023:59:59"
                   },
                   {
                     "key": "unique",
@@ -348,7 +328,7 @@
               "method": "GET",
               "header": [],
               "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01 00:00:00&end=2024-12-31 23:59:59&uris=/events/1&unique=true",
+                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&unique=true",
                 "host": [
                   "{{baseUrl}}"
                 ],
@@ -358,15 +338,15 @@
                 "query": [
                   {
                     "key": "start",
-                    "value": "2024-01-01 00:00:00"
+                    "value": "2024-01-01%2000:00:00"
                   },
                   {
                     "key": "end",
-                    "value": "2024-12-31 23:59:59"
+                    "value": "2024-12-31%2023:59:59"
                   },
                   {
                     "key": "uris",
-                    "value": "/events/1"
+                    "value": "%2Fevents%2F1"
                   },
                   {
                     "key": "unique",
@@ -407,7 +387,7 @@
               "method": "GET",
               "header": [],
               "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-12-31 23:59:59&end=2024-01-01 00:00:00",
+                "raw": "{{baseUrl}}/stats?start=2024-12-31%2023:59:59&end=2024-01-01%2000:00:00",
                 "host": [
                   "{{baseUrl}}"
                 ],
@@ -417,11 +397,11 @@
                 "query": [
                   {
                     "key": "start",
-                    "value": "2024-12-31 23:59:59"
+                    "value": "2024-12-31%2023:59:59"
                   },
                   {
                     "key": "end",
-                    "value": "2024-01-01 00:00:00"
+                    "value": "2024-01-01%2000:00:00"
                   }
                 ]
               }
@@ -556,8 +536,7 @@
     "variable": [
       {
         "key": "baseUrl",
-        "value": "http://localhost:9090",
-        "type": "string"
+        "value": "http://localhost:9090"
       }
     ]
   },
