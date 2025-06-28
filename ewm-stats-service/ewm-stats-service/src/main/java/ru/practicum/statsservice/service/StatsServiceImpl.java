@@ -21,8 +21,8 @@ import java.util.Objects;
 @Service
 @Transactional
 public class StatsServiceImpl implements StatsService {
-    private final EndpointHitRepository repository;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final EndpointHitRepository repository;
 
     @Autowired
     public StatsServiceImpl(EndpointHitRepository repository) {

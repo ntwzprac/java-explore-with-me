@@ -19,9 +19,9 @@ import java.util.List;
 
 @Component
 public class StatsClient {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final RestTemplate restTemplate;
     private final String baseUrl;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(@Value("${stats-service.url:http://localhost:9090}") String baseUrl) {
         this.baseUrl = baseUrl;
