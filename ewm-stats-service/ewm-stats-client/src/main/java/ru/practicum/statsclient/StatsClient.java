@@ -23,7 +23,7 @@ public class StatsClient {
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public StatsClient(@Value("${stats-service.service-url}") String baseUrl) {
+    public StatsClient(@Value("${stats-client.service-url}") String baseUrl) {
         this.baseUrl = baseUrl;
         this.restTemplate = new RestTemplateBuilder().build();
     }
