@@ -11,6 +11,7 @@ import ru.practicum.mainservice.dto.response.CompilationDto;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Compilation;
 import ru.practicum.mainservice.repository.CompilationRepository;
+import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.service.CompilationService;
 
 import java.util.List;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
+    private final EventRepository eventRepository;
 
     @Override
     @Transactional
     public CompilationDto saveCompilation(NewCompilationDto dto) {
+        CompilationMapper.setEventRepository(eventRepository);
         Compilation compilation = compilationRepository.save(CompilationMapper.toEntity(dto));
         return CompilationMapper.toDto(compilation);
     }
@@ -40,6 +43,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest dto) {
+        CompilationMapper.setEventRepository(eventRepository);
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
         CompilationMapper.updateEntity(compilation, dto);
@@ -48,6 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
+        CompilationMapper.setEventRepository(eventRepository);
         List<Compilation> comps = compilationRepository.findAll(PageRequest.of(from / size, size)).getContent();
         if (pinned != null) {
             comps = comps.stream().filter(c -> c.isPinned() == pinned).collect(Collectors.toList());
@@ -57,6 +62,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto getCompilation(Long compId) {
+        CompilationMapper.setEventRepository(eventRepository);
         return CompilationMapper.toDto(compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId)));
     }
