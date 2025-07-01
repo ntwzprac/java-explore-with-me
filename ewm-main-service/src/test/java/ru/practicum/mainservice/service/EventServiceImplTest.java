@@ -1,37 +1,35 @@
 package ru.practicum.mainservice.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import ru.practicum.mainservice.dto.mapper.EventMapper;
+import org.springframework.data.domain.Page;
 import ru.practicum.mainservice.dto.request.NewEventDto;
 import ru.practicum.mainservice.dto.request.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.model.*;
+import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.model.EventState;
+import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
 import ru.practicum.mainservice.service.impl.EventServiceImpl;
 import ru.practicum.statsclient.StatsClient;
-import ru.practicum.statsdto.EndpointHit;
-import ru.practicum.statsdto.ViewStats;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
-import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class EventServiceImplTest {
     @Mock
