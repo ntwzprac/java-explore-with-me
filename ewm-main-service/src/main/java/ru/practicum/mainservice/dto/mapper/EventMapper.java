@@ -85,7 +85,10 @@ public class EventMapper {
         updateCommonFields(event, dto.getTitle(), dto.getAnnotation(), dto.getDescription(), category, location, dto.getEventDate(), dto.getPaid(), dto.getParticipantLimit(), dto.getRequestModeration());
         if (dto.getStateAction() != null) {
             switch (dto.getStateAction()) {
-                case "PUBLISH_EVENT" -> event.setState(EventState.PUBLISHED);
+                case "PUBLISH_EVENT" -> {
+                    event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(java.time.LocalDateTime.now());
+                }
                 case "REJECT_EVENT" -> event.setState(EventState.CANCELED);
             }
         }
