@@ -30,4 +30,4 @@ public class CompilationMapper {
         if (dto.getPinned() != null) compilation.setPinned(dto.getPinned());
         if (dto.getEvents() != null) compilation.setEvents(dto.getEvents());
     }
-} 
+}

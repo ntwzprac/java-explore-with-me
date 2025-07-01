@@ -18,4 +18,4 @@ public class ParticipationRequestMapper {
                 .created(request.getCreated().format(FORMATTER))
                 .build();
     }
-} 
+}

@@ -36,6 +36,8 @@ public class NewEventDto {
     private String eventDate;
 
     private Boolean paid = false;
+
     private Integer participantLimit = 0;
+
     private Boolean requestModeration = true;
-} 
+}

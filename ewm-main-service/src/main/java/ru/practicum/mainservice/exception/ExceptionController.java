@@ -80,4 +80,4 @@ public class ExceptionController {
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
-} 
+}

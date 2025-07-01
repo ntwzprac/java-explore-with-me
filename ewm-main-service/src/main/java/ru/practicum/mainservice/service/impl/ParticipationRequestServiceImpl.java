@@ -139,4 +139,4 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .rejectedRequests(rejected)
                 .build();
     }
-} 
+}

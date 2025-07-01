@@ -16,4 +16,4 @@ public class CompilationDto {
     private String title;
     private boolean pinned;
     private Set<Long> events;
-} 
+}

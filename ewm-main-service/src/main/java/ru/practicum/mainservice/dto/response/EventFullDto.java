@@ -27,4 +27,4 @@ public class EventFullDto {
     private String state;
     private Integer confirmedRequests;
     private Integer views;
-} 
+}

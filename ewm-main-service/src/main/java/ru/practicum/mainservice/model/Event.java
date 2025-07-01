@@ -65,4 +65,4 @@ public class Event {
 
     @Column(nullable = false)
     private Integer views;
-} 
+}

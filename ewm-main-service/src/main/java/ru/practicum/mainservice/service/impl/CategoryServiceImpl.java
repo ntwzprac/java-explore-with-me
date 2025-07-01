@@ -64,4 +64,4 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toDto(categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found: " + catId)));
     }
-} 
+}

@@ -50,4 +50,4 @@ public class UserServiceImpl implements UserService {
         }
         return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
     }
-} 
+}

@@ -19,4 +19,4 @@ public class NewCompilationDto {
     private String title;
     private boolean pinned = false;
     private Set<Long> events;
-} 
+}

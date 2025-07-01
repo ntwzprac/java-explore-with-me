@@ -30,4 +30,4 @@ public class Compilation {
     @CollectionTable(name = "compilation_events", joinColumns = @JoinColumn(name = "compilation_id"))
     @Column(name = "event_id")
     private Set<Long> events;
-} 
+}

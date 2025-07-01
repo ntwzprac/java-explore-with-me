@@ -60,4 +60,4 @@ public class CompilationServiceImpl implements CompilationService {
         return CompilationMapper.toDto(compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId)));
     }
-} 
+}

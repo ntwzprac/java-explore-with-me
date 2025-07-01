@@ -19,4 +19,4 @@ public class EventShortDto {
     private String eventDate;
     private Integer confirmedRequests;
     private Integer views;
-} 
+}

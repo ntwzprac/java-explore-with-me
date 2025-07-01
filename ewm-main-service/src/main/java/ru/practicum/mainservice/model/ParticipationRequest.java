@@ -32,4 +32,4 @@ public class ParticipationRequest {
 
     @Column(nullable = false)
     private LocalDateTime created;
-} 
+}
