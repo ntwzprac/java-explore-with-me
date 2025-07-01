@@ -16,6 +16,7 @@ import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.EventState;
 import ru.practicum.mainservice.model.User;
+import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
@@ -123,5 +124,101 @@ class EventServiceImplTest {
         List<EventShortDto> result = eventService.getEventsPublic(null, null, null, null, null, null, null, 0, 10);
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testAddEvent_Success() {
+        NewEventDto dto = mock(NewEventDto.class);
+        when(dto.getCategory()).thenReturn(1L);
+        when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().plusHours(3).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        User user = mock(User.class);
+        Category category = mock(Category.class);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        assertDoesNotThrow(() -> eventService.addEvent(1L, dto));
+    }
+
+    @Test
+    void testAddEvent_CategoryNotFound() {
+        NewEventDto dto = mock(NewEventDto.class);
+        when(dto.getCategory()).thenReturn(1L);
+        when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().plusHours(3).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        User user = mock(User.class);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> eventService.addEvent(1L, dto));
+    }
+
+    @Test
+    void testAddEvent_ConflictDate() {
+        NewEventDto dto = mock(NewEventDto.class);
+        when(dto.getCategory()).thenReturn(1L);
+        when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().plusMinutes(30).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        User user = mock(User.class);
+        Category category = mock(Category.class);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.addEvent(1L, dto));
+    }
+
+    @Test
+    void testUpdateEventAdmin_ConflictDate() {
+        UpdateEventAdminRequest dto = mock(UpdateEventAdminRequest.class);
+        Event event = mock(Event.class);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateEventAdmin(1L, dto));
+    }
+
+    @Test
+    void testUpdateEventAdmin_CategoryNotFound() {
+        UpdateEventAdminRequest dto = mock(UpdateEventAdminRequest.class);
+        Event event = mock(Event.class);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        when(dto.getEventDate()).thenReturn(null);
+        when(dto.getCategory()).thenReturn(2L);
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> eventService.updateEventAdmin(1L, dto));
+    }
+
+    @Test
+    void testUpdateUserEvent_ConflictState() {
+        UpdateEventUserRequest dto = mock(UpdateEventUserRequest.class);
+        Event event = mock(Event.class);
+        User user = mock(User.class);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        when(event.getInitiator()).thenReturn(user);
+        when(user.getId()).thenReturn(1L);
+        when(event.getState()).thenReturn(EventState.PUBLISHED);
+        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
+    }
+
+    @Test
+    void testUpdateUserEvent_ConflictDate() {
+        UpdateEventUserRequest dto = mock(UpdateEventUserRequest.class);
+        Event event = mock(Event.class);
+        User user = mock(User.class);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        when(event.getInitiator()).thenReturn(user);
+        when(user.getId()).thenReturn(1L);
+        when(event.getState()).thenReturn(EventState.PENDING);
+        when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
+    }
+
+    @Test
+    void testUpdateUserEvent_CategoryNotFound() {
+        UpdateEventUserRequest dto = mock(UpdateEventUserRequest.class);
+        Event event = mock(Event.class);
+        User user = mock(User.class);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
+        when(event.getInitiator()).thenReturn(user);
+        when(user.getId()).thenReturn(1L);
+        when(event.getState()).thenReturn(EventState.PENDING);
+        when(dto.getEventDate()).thenReturn(null);
+        when(dto.getCategory()).thenReturn(2L);
+        when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
     }
 }
