@@ -23,4 +23,4 @@ class CompilationRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getTitle()).isEqualTo("compilation1");
     }
-} 
+}

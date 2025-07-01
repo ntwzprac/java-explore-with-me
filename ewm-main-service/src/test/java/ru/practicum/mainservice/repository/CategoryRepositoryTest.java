@@ -23,4 +23,4 @@ class CategoryRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getName()).isEqualTo("cat1");
     }
-} 
+}

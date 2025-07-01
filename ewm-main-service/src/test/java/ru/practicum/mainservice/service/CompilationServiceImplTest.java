@@ -45,4 +45,4 @@ class CompilationServiceImplTest {
         assertThrows(NotFoundException.class, () -> compilationService.getCompilation(2L));
         verify(compilationRepository, times(1)).findById(2L);
     }
-} 
+}

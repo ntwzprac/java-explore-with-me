@@ -23,4 +23,4 @@ class EventRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getTitle()).isEqualTo("event1");
     }
-} 
+}

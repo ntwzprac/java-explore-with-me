@@ -51,4 +51,4 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[0].name").value("cat1"));
         verify(categoryService, times(1)).getCategories(0, 10);
     }
-} 
+}

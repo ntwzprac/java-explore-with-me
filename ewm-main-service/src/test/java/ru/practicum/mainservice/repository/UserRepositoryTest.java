@@ -25,4 +25,4 @@ class UserRepositoryTest {
         assertThat(found.get().getName()).isEqualTo("user1");
         assertThat(found.get().getEmail()).isEqualTo("user1@email.com");
     }
-} 
+}

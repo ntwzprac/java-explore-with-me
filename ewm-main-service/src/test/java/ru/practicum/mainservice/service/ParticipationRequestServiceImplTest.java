@@ -42,4 +42,4 @@ class ParticipationRequestServiceImplTest {
         assertDoesNotThrow(() -> participationRequestService.getUserRequests(2L));
         verify(participationRequestRepository, times(1)).findById(2L);
     }
-} 
+}

@@ -51,4 +51,4 @@ class CompilationControllerTest {
                 .andExpect(jsonPath("$[0].title").value("compilation1"));
         verify(compilationService, times(1)).getCompilations(any(), anyInt(), anyInt());
     }
-} 
+}

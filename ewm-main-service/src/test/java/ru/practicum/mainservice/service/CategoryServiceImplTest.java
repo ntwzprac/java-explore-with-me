@@ -48,4 +48,4 @@ class CategoryServiceImplTest {
         assertThrows(NotFoundException.class, () -> categoryService.getCategory(2L));
         verify(categoryRepository, times(1)).findById(2L);
     }
-} 
+}

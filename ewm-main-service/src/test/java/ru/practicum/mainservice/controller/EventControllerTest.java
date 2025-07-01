@@ -51,4 +51,4 @@ class EventControllerTest {
                 .andExpect(jsonPath("$[0].title").value("event1"));
         verify(eventService, times(1)).getEventsPublic(any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt());
     }
-} 
+}

@@ -46,4 +46,4 @@ class UserServiceImplTest {
         assertThrows(NotFoundException.class, () -> userService.getUsers(java.util.Collections.singletonList(2L), 0, 1));
         verify(userRepository, times(1)).findById(2L);
     }
-} 
+}

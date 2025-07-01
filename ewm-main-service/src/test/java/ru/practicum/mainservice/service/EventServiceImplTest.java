@@ -45,4 +45,4 @@ class EventServiceImplTest {
         assertThrows(NotFoundException.class, () -> eventService.getEventPublic(2L));
         verify(eventRepository, times(1)).findById(2L);
     }
-} 
+}
