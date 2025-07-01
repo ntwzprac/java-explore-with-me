@@ -68,17 +68,21 @@ public class EventMapper {
                 .build();
     }
 
-    public static void updateEntityByAdmin(Event event, UpdateEventAdminRequest dto, Category category, Location location) {
-        if (dto.getTitle() != null) event.setTitle(dto.getTitle());
-        if (dto.getAnnotation() != null) event.setAnnotation(dto.getAnnotation());
-        if (dto.getDescription() != null) event.setDescription(dto.getDescription());
+    private static void updateCommonFields(Event event, String title, String annotation, String description, Category category, Location location, String eventDate, Boolean paid, Integer participantLimit, Boolean requestModeration) {
+        if (title != null) event.setTitle(title);
+        if (annotation != null) event.setAnnotation(annotation);
+        if (description != null) event.setDescription(description);
         if (category != null) event.setCategory(category);
         if (location != null) event.setLocation(location);
-        if (dto.getEventDate() != null)
-            event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
-        if (dto.getPaid() != null) event.setPaid(dto.getPaid());
-        if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
-        if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
+        if (eventDate != null)
+            event.setEventDate(java.time.LocalDateTime.parse(eventDate, FORMATTER));
+        if (paid != null) event.setPaid(paid);
+        if (participantLimit != null) event.setParticipantLimit(participantLimit);
+        if (requestModeration != null) event.setRequestModeration(requestModeration);
+    }
+
+    public static void updateEntityByAdmin(Event event, UpdateEventAdminRequest dto, Category category, Location location) {
+        updateCommonFields(event, dto.getTitle(), dto.getAnnotation(), dto.getDescription(), category, location, dto.getEventDate(), dto.getPaid(), dto.getParticipantLimit(), dto.getRequestModeration());
         if (dto.getStateAction() != null) {
             switch (dto.getStateAction()) {
                 case "PUBLISH_EVENT" -> event.setState(EventState.PUBLISHED);
@@ -88,16 +92,7 @@ public class EventMapper {
     }
 
     public static void updateEntityByUser(Event event, UpdateEventUserRequest dto, Category category, Location location) {
-        if (dto.getTitle() != null) event.setTitle(dto.getTitle());
-        if (dto.getAnnotation() != null) event.setAnnotation(dto.getAnnotation());
-        if (dto.getDescription() != null) event.setDescription(dto.getDescription());
-        if (category != null) event.setCategory(category);
-        if (location != null) event.setLocation(location);
-        if (dto.getEventDate() != null)
-            event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
-        if (dto.getPaid() != null) event.setPaid(dto.getPaid());
-        if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
-        if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
+        updateCommonFields(event, dto.getTitle(), dto.getAnnotation(), dto.getDescription(), category, location, dto.getEventDate(), dto.getPaid(), dto.getParticipantLimit(), dto.getRequestModeration());
         if (dto.getStateAction() != null) {
             switch (dto.getStateAction()) {
                 case "SEND_TO_REVIEW" -> event.setState(EventState.PENDING);
