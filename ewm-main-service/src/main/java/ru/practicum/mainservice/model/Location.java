@@ -1,7 +1,10 @@
 package ru.practicum.mainservice.model;
 
 import jakarta.persistence.Embeddable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Embeddable
 @Data

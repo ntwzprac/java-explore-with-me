@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -7,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.mainservice.dto.request.NewCategoryDto;
 import ru.practicum.mainservice.dto.response.CategoryDto;
 import ru.practicum.mainservice.service.CategoryService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/admin/categories")

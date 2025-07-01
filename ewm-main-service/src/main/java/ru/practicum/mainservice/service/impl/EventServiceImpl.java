@@ -1,6 +1,8 @@
 package ru.practicum.mainservice.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,21 +13,20 @@ import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.NotFoundException;
+import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.User;
-import ru.practicum.mainservice.model.Category;
+import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
-import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.service.EventService;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
-import org.springframework.beans.factory.annotation.Value;
-import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +36,9 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
+    private final HttpServletRequest httpServletRequest;
     @Value("${spring.application.name}")
     private String appName;
-    private final HttpServletRequest httpServletRequest;
 
     @Override
     public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {

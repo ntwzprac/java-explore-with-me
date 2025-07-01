@@ -3,7 +3,8 @@ package ru.practicum.mainservice.dto.mapper;
 import ru.practicum.mainservice.dto.request.NewEventDto;
 import ru.practicum.mainservice.dto.request.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
-import ru.practicum.mainservice.dto.response.*;
+import ru.practicum.mainservice.dto.response.EventFullDto;
+import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.model.*;
 
 import java.time.format.DateTimeFormatter;
@@ -73,7 +74,8 @@ public class EventMapper {
         if (dto.getDescription() != null) event.setDescription(dto.getDescription());
         if (category != null) event.setCategory(category);
         if (location != null) event.setLocation(location);
-        if (dto.getEventDate() != null) event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
+        if (dto.getEventDate() != null)
+            event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
         if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
@@ -91,7 +93,8 @@ public class EventMapper {
         if (dto.getDescription() != null) event.setDescription(dto.getDescription());
         if (category != null) event.setCategory(category);
         if (location != null) event.setLocation(location);
-        if (dto.getEventDate() != null) event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
+        if (dto.getEventDate() != null)
+            event.setEventDate(java.time.LocalDateTime.parse(dto.getEventDate(), FORMATTER));
         if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());

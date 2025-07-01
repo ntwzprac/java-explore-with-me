@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.dto.mapper;
 
-import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.dto.request.NewUserRequest;
 import ru.practicum.mainservice.dto.response.UserDto;
 import ru.practicum.mainservice.dto.response.UserShortDto;
+import ru.practicum.mainservice.model.User;
 
 public class UserMapper {
     public static UserDto toDto(User user) {

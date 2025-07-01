@@ -1,9 +1,9 @@
 package ru.practicum.mainservice.dto.mapper;
 
-import ru.practicum.mainservice.model.Compilation;
 import ru.practicum.mainservice.dto.request.NewCompilationDto;
 import ru.practicum.mainservice.dto.request.UpdateCompilationRequest;
 import ru.practicum.mainservice.dto.response.CompilationDto;
+import ru.practicum.mainservice.model.Compilation;
 
 public class CompilationMapper {
     public static CompilationDto toDto(Compilation compilation) {

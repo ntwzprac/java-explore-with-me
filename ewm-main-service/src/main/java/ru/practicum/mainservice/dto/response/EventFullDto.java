@@ -1,6 +1,9 @@
 package ru.practicum.mainservice.dto.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.mainservice.model.Location;
 
 @Data
