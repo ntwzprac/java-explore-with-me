@@ -55,4 +55,4 @@ class AdminCompilationControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
-} 
+}

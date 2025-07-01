@@ -54,4 +54,4 @@ class AdminCategoryControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
-} 
+}

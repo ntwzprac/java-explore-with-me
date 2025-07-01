@@ -47,4 +47,4 @@ class AdminEventControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
-} 
+}
