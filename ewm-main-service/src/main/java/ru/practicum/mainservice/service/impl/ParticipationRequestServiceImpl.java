@@ -7,6 +7,7 @@ import ru.practicum.mainservice.dto.mapper.ParticipationRequestMapper;
 import ru.practicum.mainservice.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.mainservice.dto.response.EventRequestStatusUpdateResult;
 import ru.practicum.mainservice.dto.response.ParticipationRequestDto;
+import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.model.ParticipationRequest;
@@ -44,16 +45,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Initiator cannot request participation in their own event");
+            throw new ConflictException("Initiator cannot request participation in their own event");
         }
         if (!event.getState().name().equals("PUBLISHED")) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Cannot participate in unpublished event");
+            throw new ConflictException("Cannot participate in unpublished event");
         }
         if (requestRepository.existsByRequesterIdAndEventId(userId, eventId)) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Duplicate participation request");
+            throw new ConflictException("Duplicate participation request");
         }
         if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Participant limit reached");
+            throw new ConflictException("Participant limit reached");
         }
         String status;
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
@@ -107,7 +108,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         int confirmedCount = event.getConfirmedRequests();
         for (ParticipationRequest r : requests) {
             if (!r.getStatus().equals("PENDING")) {
-                throw new ru.practicum.mainservice.exception.ConflictException("Request must have status PENDING");
+                throw new ConflictException("Request must have status PENDING");
             }
             if ("CONFIRMED".equals(req.getStatus())) {
                 if (limit == 0 || confirmedCount < limit) {

@@ -12,11 +12,9 @@ import ru.practicum.mainservice.dto.request.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
+import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.model.Category;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.EventState;
-import ru.practicum.mainservice.model.User;
+import ru.practicum.mainservice.model.*;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
@@ -62,7 +60,7 @@ public class EventServiceImpl implements EventService {
         if (dto.getEventDate() != null) {
             LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             if (eventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ru.practicum.mainservice.exception.ConflictException("Event date must be at least 1 hour in the future for admin update");
+                throw new ConflictException("Event date must be at least 1 hour in the future for admin update");
             }
         }
         Category category = null;
@@ -70,7 +68,7 @@ public class EventServiceImpl implements EventService {
             category = categoryRepository.findById(dto.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category not found: " + dto.getCategory()));
         }
-        ru.practicum.mainservice.model.Location location = dto.getLocation();
+        Location location = dto.getLocation();
         EventMapper.updateEntityByAdmin(event, dto, category, location);
         return EventMapper.toFullDto(eventRepository.save(event));
     }
@@ -91,12 +89,12 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Category not found: " + dto.getCategory()));
         LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Event date must be at least 2 hours in the future");
+            throw new ConflictException("Event date must be at least 2 hours in the future");
         }
         Event event = EventMapper.toEntity(dto, user, category);
         event.setEventDate(eventDate);
         event.setCreatedOn(LocalDateTime.now());
-        event.setState(ru.practicum.mainservice.model.EventState.PENDING);
+        event.setState(EventState.PENDING);
         event.setConfirmedRequests(0);
         event.setViews(0);
         Event saved = eventRepository.save(event);
@@ -121,13 +119,13 @@ public class EventServiceImpl implements EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new NotFoundException("Event does not belong to user: " + userId);
         }
-        if (!(event.getState() == ru.practicum.mainservice.model.EventState.PENDING || event.getState() == ru.practicum.mainservice.model.EventState.CANCELED)) {
-            throw new ru.practicum.mainservice.exception.ConflictException("Only pending or canceled events can be changed");
+        if (!(event.getState() == EventState.PENDING || event.getState() == EventState.CANCELED)) {
+            throw new ConflictException("Only pending or canceled events can be changed");
         }
         if (dto.getEventDate() != null) {
             LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-                throw new ru.practicum.mainservice.exception.ConflictException("Event date must be at least 2 hours in the future");
+                throw new ConflictException("Event date must be at least 2 hours in the future");
             }
         }
         Category category = null;
@@ -135,7 +133,7 @@ public class EventServiceImpl implements EventService {
             category = categoryRepository.findById(dto.getCategory())
                     .orElseThrow(() -> new NotFoundException("Category not found: " + dto.getCategory()));
         }
-        ru.practicum.mainservice.model.Location location = dto.getLocation();
+        Location location = dto.getLocation();
         EventMapper.updateEntityByUser(event, dto, category, location);
         return EventMapper.toFullDto(eventRepository.save(event));
     }
@@ -188,7 +186,7 @@ public class EventServiceImpl implements EventService {
                 .build());
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
-        if (event.getState() != ru.practicum.mainservice.model.EventState.PUBLISHED) {
+        if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event is not published");
         }
         event.setViews(event.getViews() + 1);
