@@ -1,15 +1,11 @@
 package ru.practicum.mainservice.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.ParticipationRequest;
-import ru.practicum.mainservice.model.User;
-import ru.practicum.mainservice.model.Category;
-import ru.practicum.mainservice.model.EventState;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import ru.practicum.mainservice.model.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

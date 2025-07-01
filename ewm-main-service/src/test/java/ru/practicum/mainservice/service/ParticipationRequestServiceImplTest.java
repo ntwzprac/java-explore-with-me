@@ -6,16 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.practicum.mainservice.model.ParticipationRequest;
+import ru.practicum.mainservice.model.*;
 import ru.practicum.mainservice.repository.ParticipationRequestRepository;
 import ru.practicum.mainservice.service.impl.ParticipationRequestServiceImpl;
-import ru.practicum.mainservice.model.Event;
-import ru.practicum.mainservice.model.Category;
-import ru.practicum.mainservice.model.EventState;
-import java.time.LocalDateTime;
-import ru.practicum.mainservice.model.User;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
