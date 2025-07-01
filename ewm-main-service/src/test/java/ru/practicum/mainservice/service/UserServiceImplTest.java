@@ -35,15 +35,15 @@ class UserServiceImplTest {
 
     @Test
     void getUserById_ShouldReturnUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findAllById(java.util.Collections.singletonList(1L))).thenReturn(java.util.Collections.singletonList(user));
         assertDoesNotThrow(() -> userService.getUsers(java.util.Collections.singletonList(1L), 0, 1));
-        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findAllById(java.util.Collections.singletonList(1L));
     }
 
     @Test
-    void getUserById_NotFound_ShouldThrowException() {
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> userService.getUsers(java.util.Collections.singletonList(2L), 0, 1));
-        verify(userRepository, times(1)).findById(2L);
+    void getUserById_NotFound_ShouldReturnEmptyList() {
+        when(userRepository.findAllById(java.util.Collections.singletonList(2L))).thenReturn(java.util.Collections.emptyList());
+        assertDoesNotThrow(() -> userService.getUsers(java.util.Collections.singletonList(2L), 0, 1));
+        verify(userRepository, times(1)).findAllById(java.util.Collections.singletonList(2L));
     }
 }
