@@ -5,22 +5,22 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.mainservice.dto.mapper.CompilationMapper;
+import ru.practicum.mainservice.dto.mapper.EventMapper;
 import ru.practicum.mainservice.dto.request.NewCompilationDto;
 import ru.practicum.mainservice.dto.request.UpdateCompilationRequest;
 import ru.practicum.mainservice.dto.response.CompilationDto;
+import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Compilation;
+import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.CompilationRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.service.CompilationService;
-import ru.practicum.mainservice.dto.mapper.EventMapper;
-import ru.practicum.mainservice.dto.response.EventShortDto;
-import ru.practicum.mainservice.model.Event;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor

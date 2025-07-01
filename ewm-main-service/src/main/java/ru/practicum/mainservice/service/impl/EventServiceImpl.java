@@ -15,6 +15,7 @@ import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.model.EventState;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
@@ -23,10 +24,9 @@ import ru.practicum.mainservice.service.EventService;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
-import ru.practicum.mainservice.model.EventState;
-import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
