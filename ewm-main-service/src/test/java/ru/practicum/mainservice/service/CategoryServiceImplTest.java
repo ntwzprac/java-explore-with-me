@@ -6,16 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.mainservice.dto.response.CategoryDto;
+import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.service.impl.CategoryServiceImpl;
-import ru.practicum.mainservice.dto.response.CategoryDto;
-import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

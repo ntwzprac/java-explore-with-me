@@ -16,7 +16,6 @@ import ru.practicum.mainservice.service.CategoryService;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,8 +43,8 @@ class CategoryControllerTest {
         );
         when(categoryService.getCategories(0, 10)).thenReturn(categories);
         mockMvc.perform(get("/categories")
-                .param("from", "0")
-                .param("size", "10"))
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1L))

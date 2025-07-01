@@ -6,15 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Event;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.service.impl.EventServiceImpl;
-import ru.practicum.mainservice.dto.response.EventFullDto;
-import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

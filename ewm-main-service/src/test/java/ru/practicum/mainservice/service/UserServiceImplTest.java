@@ -6,15 +6,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.UserRepository;
 import ru.practicum.mainservice.service.impl.UserServiceImpl;
-import ru.practicum.mainservice.dto.response.UserDto;
-import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

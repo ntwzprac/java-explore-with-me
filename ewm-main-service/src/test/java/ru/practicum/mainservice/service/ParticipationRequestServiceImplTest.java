@@ -9,12 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.mainservice.model.ParticipationRequest;
 import ru.practicum.mainservice.repository.ParticipationRequestRepository;
 import ru.practicum.mainservice.service.impl.ParticipationRequestServiceImpl;
-import ru.practicum.mainservice.dto.response.ParticipationRequestDto;
-import ru.practicum.mainservice.exception.NotFoundException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
