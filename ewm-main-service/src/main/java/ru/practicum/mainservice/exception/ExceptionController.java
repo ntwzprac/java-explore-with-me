@@ -7,6 +7,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.mainservice.dto.response.ApiError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +19,7 @@ import java.util.Collections;
 @RestControllerAdvice
 public class ExceptionController {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final Logger log = LoggerFactory.getLogger(ExceptionController.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException e) {
@@ -57,12 +62,39 @@ public class ExceptionController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message("Malformed JSON or request body: " + e.getMessage())
+                .reason("Incorrectly made request.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraintViolation(ConstraintViolationException e) {
+        String message = e.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .findFirst().orElse("Validation failed");
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message(message)
+                .reason("Incorrectly made request.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.badRequest().body(error);
+    }
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ApiError> handleConflict(ConflictException e) {
         ApiError error = ApiError.builder()
                 .errors(Collections.singletonList(e.toString()))
                 .message(e.getMessage())
-                .reason("Integrity constraint has been violated.")
+                .reason("Conflict or integrity constraint.")
                 .status(HttpStatus.CONFLICT.name())
                 .timestamp(LocalDateTime.now().format(FORMATTER))
                 .build();
@@ -71,6 +103,7 @@ public class ExceptionController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleOther(Exception e) {
+        log.error("Unexpected error", e);
         ApiError error = ApiError.builder()
                 .errors(Collections.singletonList(e.toString()))
                 .message(e.getMessage())

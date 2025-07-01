@@ -100,7 +100,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (!event.getInitiator().getId().equals(userId)) {
             throw new NotFoundException("Event does not belong to user: " + userId);
         }
-        List<ParticipationRequest> requests = requestRepository.findAllById(req.getRequestIds());
+        List<ParticipationRequest> requests = requestRepository.findAllByIdIn(req.getRequestIds());
         List<ParticipationRequestDto> confirmed = new ArrayList<>();
         List<ParticipationRequestDto> rejected = new ArrayList<>();
         int limit = event.getParticipantLimit();
@@ -124,9 +124,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             }
         }
         if (limit != 0 && confirmedCount >= limit) {
-            List<ParticipationRequest> pending = requestRepository.findByEventId(eventId).stream()
-                    .filter(r -> r.getStatus().equals("PENDING"))
-                    .collect(java.util.stream.Collectors.toList());
+            List<ParticipationRequest> pending = requestRepository.findByEventIdAndStatus(eventId, "PENDING");
             for (ParticipationRequest r : pending) {
                 r.setStatus("REJECTED");
                 rejected.add(ParticipationRequestMapper.toDto(requestRepository.save(r)));

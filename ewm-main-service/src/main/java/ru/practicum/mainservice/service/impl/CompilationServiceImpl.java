@@ -13,9 +13,13 @@ import ru.practicum.mainservice.model.Compilation;
 import ru.practicum.mainservice.repository.CompilationRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.service.CompilationService;
+import ru.practicum.mainservice.dto.mapper.EventMapper;
+import ru.practicum.mainservice.dto.response.EventShortDto;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +31,15 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto saveCompilation(NewCompilationDto dto) {
-        CompilationMapper.setEventRepository(eventRepository);
         Compilation compilation = compilationRepository.save(CompilationMapper.toEntity(dto));
-        return CompilationMapper.toDto(compilation);
+        Set<EventShortDto> events = new HashSet<>();
+        if (compilation.getEvents() != null) {
+            events = compilation.getEvents().stream()
+                    .map(eventId -> eventRepository.findById(eventId).map(EventMapper::toShortDto).orElse(null))
+                    .filter(e -> e != null)
+                    .collect(Collectors.toSet());
+        }
+        return CompilationMapper.toDto(compilation, events);
     }
 
     @Override
@@ -43,27 +53,51 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest dto) {
-        CompilationMapper.setEventRepository(eventRepository);
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
         CompilationMapper.updateEntity(compilation, dto);
-        return CompilationMapper.toDto(compilationRepository.save(compilation));
+        Compilation saved = compilationRepository.save(compilation);
+        Set<EventShortDto> events = new HashSet<>();
+        if (saved.getEvents() != null) {
+            events = saved.getEvents().stream()
+                    .map(eventId -> eventRepository.findById(eventId).map(EventMapper::toShortDto).orElse(null))
+                    .filter(e -> e != null)
+                    .collect(Collectors.toSet());
+        }
+        return CompilationMapper.toDto(saved, events);
     }
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, int from, int size) {
-        CompilationMapper.setEventRepository(eventRepository);
-        List<Compilation> comps = compilationRepository.findAll(PageRequest.of(from / size, size)).getContent();
+        List<Compilation> comps;
         if (pinned != null) {
-            comps = comps.stream().filter(c -> c.isPinned() == pinned).collect(Collectors.toList());
+            comps = compilationRepository.findByPinned(pinned);
+        } else {
+            comps = compilationRepository.findAll(PageRequest.of(from / size, size)).getContent();
         }
-        return comps.stream().map(CompilationMapper::toDto).collect(Collectors.toList());
+        return comps.stream().map(comp -> {
+            Set<EventShortDto> events = new HashSet<>();
+            if (comp.getEvents() != null) {
+                events = comp.getEvents().stream()
+                        .map(eventId -> eventRepository.findById(eventId).map(EventMapper::toShortDto).orElse(null))
+                        .filter(e -> e != null)
+                        .collect(Collectors.toSet());
+            }
+            return CompilationMapper.toDto(comp, events);
+        }).collect(Collectors.toList());
     }
 
     @Override
     public CompilationDto getCompilation(Long compId) {
-        CompilationMapper.setEventRepository(eventRepository);
-        return CompilationMapper.toDto(compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId)));
+        Compilation comp = compilationRepository.findById(compId)
+                .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
+        Set<EventShortDto> events = new HashSet<>();
+        if (comp.getEvents() != null) {
+            events = comp.getEvents().stream()
+                    .map(eventId -> eventRepository.findById(eventId).map(EventMapper::toShortDto).orElse(null))
+                    .filter(e -> e != null)
+                    .collect(Collectors.toSet());
+        }
+        return CompilationMapper.toDto(comp, events);
     }
 }

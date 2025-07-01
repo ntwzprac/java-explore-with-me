@@ -23,10 +23,11 @@ import ru.practicum.mainservice.service.EventService;
 import ru.practicum.statsclient.StatsClient;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
+import ru.practicum.mainservice.model.EventState;
+import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,23 +43,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
-        return eventRepository.findAll(PageRequest.of(from / size, size)).stream()
-                .filter(event -> users == null || users.isEmpty() || users.contains(event.getInitiator().getId()))
-                .filter(event -> states == null || states.isEmpty() || states.contains(event.getState().name()))
-                .filter(event -> categories == null || categories.isEmpty() || categories.contains(event.getCategory().getId()))
-                .filter(event -> {
-                    if (rangeStart != null) {
-                        LocalDateTime start = LocalDateTime.parse(rangeStart, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                        if (event.getEventDate().isBefore(start)) return false;
-                    }
-                    if (rangeEnd != null) {
-                        LocalDateTime end = LocalDateTime.parse(rangeEnd, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                        if (event.getEventDate().isAfter(end)) return false;
-                    }
-                    return true;
-                })
-                .map(EventMapper::toFullDto)
-                .collect(Collectors.toList());
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        List<EventState> stateEnums = null;
+        if (states != null && !states.isEmpty()) {
+            stateEnums = states.stream().map(EventState::valueOf).toList();
+        }
+        LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
+        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
+        return eventRepository.searchEventsAdmin(users, stateEnums, categories, start, end, pageRequest)
+                .stream().map(EventMapper::toFullDto).toList();
     }
 
     @Override
@@ -84,10 +77,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
-        return eventRepository.findAll(PageRequest.of(from / size, size)).stream()
-                .filter(event -> event.getInitiator().getId().equals(userId))
-                .map(EventMapper::toShortDto)
-                .collect(Collectors.toList());
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        return eventRepository.findByInitiatorId(userId, pageRequest)
+                .stream().map(EventMapper::toShortDto).toList();
     }
 
     @Override
@@ -150,6 +142,19 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : now;
+        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
+        List<Event> events = eventRepository.searchEventsPublic(text, categories, paid, start, end, pageRequest)
+                .stream()
+                .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
+                .toList();
+        if (sort != null && sort.equals("VIEWS")) {
+            events = events.stream().sorted((e1, e2) -> Integer.compare(e2.getViews(), e1.getViews())).toList();
+        } else {
+            events = events.stream().sorted((e1, e2) -> e1.getEventDate().compareTo(e2.getEventDate())).toList();
+        }
         String uri = httpServletRequest.getRequestURI();
         String ip = httpServletRequest.getRemoteAddr();
         statsClient.saveHit(EndpointHit.builder()
@@ -158,41 +163,16 @@ public class EventServiceImpl implements EventService {
                 .ip(ip)
                 .timestamp(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build());
-        List<Event> events = eventRepository.findAll(PageRequest.of(from / size, size)).stream()
-                .filter(event -> event.getState() == ru.practicum.mainservice.model.EventState.PUBLISHED)
-                .filter(event -> text == null || text.isBlank() ||
-                        event.getAnnotation().toLowerCase().contains(text.toLowerCase()) ||
-                        event.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .filter(event -> categories == null || categories.isEmpty() || categories.contains(event.getCategory().getId()))
-                .filter(event -> paid == null || event.getPaid().equals(paid))
-                .filter(event -> {
-                    LocalDateTime now = LocalDateTime.now();
-                    LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : now;
-                    LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
-                    if (event.getEventDate().isBefore(start)) return false;
-                    if (end != null && event.getEventDate().isAfter(end)) return false;
-                    return true;
-                })
-                .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
-                .sorted((e1, e2) -> {
-                    if (sort == null || sort.equals("EVENT_DATE")) {
-                        return e1.getEventDate().compareTo(e2.getEventDate());
-                    } else if (sort.equals("VIEWS")) {
-                        return Integer.compare(e2.getViews(), e1.getViews());
-                    }
-                    return 0;
-                })
-                .collect(Collectors.toList());
-        List<String> uris = events.stream().map(e -> "/events/" + e.getId()).collect(Collectors.toList());
-        LocalDateTime start = events.stream().map(Event::getPublishedOn).filter(java.util.Objects::nonNull).min(LocalDateTime::compareTo).orElse(LocalDateTime.now().minusYears(1));
-        LocalDateTime end = LocalDateTime.now();
-        List<ViewStats> stats = statsClient.getStats(start, end, uris, false);
+        List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
+        LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(java.util.Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
+        LocalDateTime statsEnd = now;
+        List<ViewStats> stats = statsClient.getStats(statsStart, statsEnd, uris, false);
         return events.stream().map(event -> {
             EventShortDto dto = EventMapper.toShortDto(event);
             String eventUri = "/events/" + event.getId();
             stats.stream().filter(s -> s.getUri().equals(eventUri)).findFirst().ifPresent(viewStats -> dto.setViews(viewStats.getHits().intValue()));
             return dto;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
