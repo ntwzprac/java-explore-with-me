@@ -31,4 +31,4 @@ public class AdminCompilationController {
     public CompilationDto updateCompilation(@PathVariable Long compId, @RequestBody @Valid UpdateCompilationRequest dto) {
         return compilationService.updateCompilation(compId, dto);
     }
-} 
+}

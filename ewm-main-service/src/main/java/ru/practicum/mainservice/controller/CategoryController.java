@@ -25,4 +25,4 @@ public class CategoryController {
     public CategoryDto getCategory(@PathVariable Long catId) {
         return categoryService.getCategory(catId);
     }
-} 
+}

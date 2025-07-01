@@ -38,4 +38,4 @@ public class UserEventController {
     public EventFullDto updateUserEvent(@PathVariable Long userId, @PathVariable Long eventId, @RequestBody @Valid UpdateEventUserRequest dto) {
         return eventService.updateUserEvent(userId, eventId, dto);
     }
-} 
+}

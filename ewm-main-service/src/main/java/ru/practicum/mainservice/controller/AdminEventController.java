@@ -32,4 +32,4 @@ public class AdminEventController {
     public EventFullDto updateEvent(@PathVariable Long eventId, @RequestBody @Valid UpdateEventAdminRequest dto) {
         return eventService.updateEventAdmin(eventId, dto);
     }
-} 
+}

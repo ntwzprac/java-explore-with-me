@@ -34,4 +34,4 @@ public class AdminUserController {
                                   @RequestParam(defaultValue = "10") int size) {
         return userService.getUsers(ids, from, size);
     }
-} 
+}

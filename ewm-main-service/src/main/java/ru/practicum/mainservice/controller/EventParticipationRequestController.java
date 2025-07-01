@@ -26,4 +26,4 @@ public class EventParticipationRequestController {
                                                              @RequestBody EventRequestStatusUpdateRequest request) {
         return requestService.changeRequestStatus(userId, eventId, request);
     }
-} 
+}

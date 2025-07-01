@@ -33,4 +33,4 @@ public class AdminCategoryController {
     public CategoryDto updateCategory(@PathVariable Long catId, @RequestBody @Valid CategoryDto dto) {
         return categoryService.updateCategory(catId, dto);
     }
-} 
+}

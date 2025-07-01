@@ -13,4 +13,4 @@ public class UpdateCompilationRequest {
     private String title;
     private Boolean pinned;
     private Set<Long> events;
-} 
+}

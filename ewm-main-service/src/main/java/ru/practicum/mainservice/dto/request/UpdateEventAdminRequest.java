@@ -18,4 +18,4 @@ public class UpdateEventAdminRequest {
     private Integer participantLimit;
     private Boolean requestModeration;
     private String stateAction;
-} 
+}

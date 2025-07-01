@@ -33,4 +33,4 @@ public class EventController {
     public EventFullDto getEvent(@PathVariable Long id) {
         return eventService.getEventPublic(id);
     }
-} 
+}
