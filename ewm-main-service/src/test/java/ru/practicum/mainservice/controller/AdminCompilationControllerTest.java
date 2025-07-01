@@ -15,7 +15,7 @@ import ru.practicum.mainservice.service.CompilationService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminCompilationController.class)
 class AdminCompilationControllerTest {
@@ -33,8 +33,8 @@ class AdminCompilationControllerTest {
         CompilationDto response = new CompilationDto();
         Mockito.when(compilationService.saveCompilation(any())).thenReturn(response);
         mockMvc.perform(post("/admin/compilations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 
@@ -51,8 +51,8 @@ class AdminCompilationControllerTest {
         CompilationDto response = new CompilationDto();
         Mockito.when(compilationService.updateCompilation(any(), any())).thenReturn(response);
         mockMvc.perform(patch("/admin/compilations/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 }

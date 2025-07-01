@@ -14,7 +14,7 @@ import ru.practicum.mainservice.service.CategoryService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminCategoryController.class)
 class AdminCategoryControllerTest {
@@ -32,8 +32,8 @@ class AdminCategoryControllerTest {
         CategoryDto response = new CategoryDto();
         Mockito.when(categoryService.addCategory(any())).thenReturn(response);
         mockMvc.perform(post("/admin/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
     }
 
@@ -50,8 +50,8 @@ class AdminCategoryControllerTest {
         CategoryDto response = new CategoryDto();
         Mockito.when(categoryService.updateCategory(any(), any())).thenReturn(response);
         mockMvc.perform(patch("/admin/categories/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
 }
