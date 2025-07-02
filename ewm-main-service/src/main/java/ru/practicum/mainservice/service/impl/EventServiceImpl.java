@@ -33,7 +33,6 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -92,6 +91,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
@@ -130,6 +130,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         return eventRepository.findByInitiatorId(userId, pageRequest)
@@ -155,6 +156,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EventFullDto getUserEvent(Long userId, Long eventId) {
         Event event = getEventOrThrow(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
@@ -181,6 +183,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
