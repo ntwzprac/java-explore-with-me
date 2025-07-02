@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "edd9f937-13c8-41f4-a5eb-c7c78d138029",
+		"_postman_id": "131a5a78-9d18-4537-b686-9e2c356b05b8",
 		"name": "ExploreWithMe Stats Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42721807"
@@ -511,45 +511,136 @@
 					"item": [
 						{
 							"name": "1. Add Category - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {pm.expect(pm.response.code).to.equal(201);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('id');",
+											"pm.expect(json).to.have.property('name');"
+										]
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
-								"header": [{"key": "Content-Type", "value": "application/json"}],
-								"body": {"mode": "raw", "raw": "{\n  \"name\": \"Концерты\"\n}"},
-								"url": {"raw": "{{mainServiceUrl}}/admin/categories", "host": ["{{mainServiceUrl}}"], "path": ["admin", "categories"]}
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Концерты\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/categories",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"categories"
+									]
+								}
 							},
-							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-								"pm.test(\"Status code is 201\", function () {pm.expect(pm.response.code).to.equal(201);});",
-								"const json = pm.response.json();",
-								"pm.expect(json).to.have.property('id');",
-								"pm.expect(json).to.have.property('name');"
-							]}}]
+							"response": []
 						},
 						{
 							"name": "2. Get Categories - Basic",
-							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories", "host": ["{{mainServiceUrl}}"], "path": ["categories"]}},
-							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-								"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
-								"pm.expect(pm.response.json()).to.be.an('array');"
-							]}}]
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+											"pm.expect(pm.response.json()).to.be.an('array');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories"
+									]
+								}
+							},
+							"response": []
 						},
 						{
 							"name": "3. Get Category by ID - Valid",
-							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories/1", "host": ["{{mainServiceUrl}}"], "path": ["categories", "1"]}},
-							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-								"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
-								"const json = pm.response.json();",
-								"pm.expect(json).to.have.property('id');",
-								"pm.expect(json).to.have.property('name');"
-							]}}]
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('id');",
+											"pm.expect(json).to.have.property('name');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
 						},
 						{
 							"name": "4. Get Category by ID - Not Found",
-							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories/99999", "host": ["{{mainServiceUrl}}"], "path": ["categories", "99999"]}},
-							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
-								"pm.test(\"Status code is 404\", function () {pm.expect(pm.response.code).to.equal(404);});",
-								"const json = pm.response.json();",
-								"pm.expect(json).to.have.property('message');"
-							]}}]
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {pm.expect(pm.response.code).to.equal(404);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('message');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories/99999",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories",
+										"99999"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -878,7 +969,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 201\", function () {",
 											"    pm.expect(pm.response.code).to.equal(201);",
@@ -889,7 +979,9 @@
 											"    pm.expect(json).to.have.property('name');",
 											"    pm.expect(json).to.have.property('email');",
 											"});"
-										]
+										],
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -903,7 +995,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"Иван Петров\",\n  \"email\": \"ivan.petrov@practicummail.ru\"\n}"
+									"raw": "{\n  \"name\": \"Иван Петров\",\n  \"email\": \"ivan.petrov@mail.ru\"\n}"
 								},
 								"url": {
 									"raw": "{{mainServiceUrl}}/admin/users",
@@ -939,6 +1031,53 @@
 							"request": {
 								"method": "GET",
 								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/users",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Add User (2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.test(\"Response has id, name, email\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('name');",
+											"    pm.expect(json).to.have.property('email');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Петр Иванов\",\n  \"email\": \"petr.ivanov@mail.ru\"\n}"
+								},
 								"url": {
 									"raw": "{{mainServiceUrl}}/admin/users",
 									"host": [
@@ -1120,7 +1259,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"type": "text/javascript",
 										"exec": [
 											"pm.test(\"Status code is 201\", function () {",
 											"    pm.expect(pm.response.code).to.equal(201);",
@@ -1130,7 +1268,9 @@
 											"    pm.expect(json).to.have.property('id');",
 											"    pm.expect(json).to.have.property('status');",
 											"});"
-										]
+										],
+										"type": "text/javascript",
+										"packages": {}
 									}
 								}
 							],
@@ -1138,13 +1278,13 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{mainServiceUrl}}/users/1/requests?eventId=1",
+									"raw": "{{mainServiceUrl}}/users/2/requests?eventId=1",
 									"host": [
 										"{{mainServiceUrl}}"
 									],
 									"path": [
 										"users",
-										"1",
+										"2",
 										"requests"
 									],
 									"query": [
@@ -1187,6 +1327,47 @@
 										"users",
 										"1",
 										"requests"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Add Participation Request - Invalid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 409\", function () {",
+											"    pm.expect(pm.response.code).to.equal(409);",
+											"});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('message');"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/requests?eventId=1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"requests"
+									],
+									"query": [
+										{
+											"key": "eventId",
+											"value": "1"
+										}
 									]
 								}
 							},
