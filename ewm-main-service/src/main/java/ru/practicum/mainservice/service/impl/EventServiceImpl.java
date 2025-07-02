@@ -13,6 +13,7 @@ import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.ConflictException;
+import ru.practicum.mainservice.exception.InvalidDateException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.*;
 import ru.practicum.mainservice.repository.CategoryRepository;
@@ -60,7 +61,7 @@ public class EventServiceImpl implements EventService {
         if (dto.getEventDate() != null) {
             LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             if (eventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ConflictException("Event date must be at least 1 hour in the future for admin update");
+                throw new InvalidDateException("Event date must be at least 1 hour in the future for admin update");
             }
         }
         Category category = null;
@@ -89,7 +90,7 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Category not found: " + dto.getCategory()));
         LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new ConflictException("Event date must be at least 2 hours in the future");
+            throw new InvalidDateException("Event date must be at least 2 hours in the future");
         }
         Event event = EventMapper.toEntity(dto, user, category);
         event.setEventDate(eventDate);
@@ -125,7 +126,7 @@ public class EventServiceImpl implements EventService {
         if (dto.getEventDate() != null) {
             LocalDateTime eventDate = LocalDateTime.parse(dto.getEventDate(), java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-                throw new ConflictException("Event date must be at least 2 hours in the future");
+                throw new InvalidDateException("Event date must be at least 2 hours in the future");
             }
         }
         Category category = null;
@@ -163,8 +164,7 @@ public class EventServiceImpl implements EventService {
                 .build());
         List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
         LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(java.util.Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
-        LocalDateTime statsEnd = now;
-        List<ViewStats> stats = statsClient.getStats(statsStart, statsEnd, uris, false);
+        List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, false);
         return events.stream().map(event -> {
             EventShortDto dto = EventMapper.toShortDto(event);
             String eventUri = "/events/" + event.getId();
@@ -196,7 +196,7 @@ public class EventServiceImpl implements EventService {
         LocalDateTime end = LocalDateTime.now();
         List<ViewStats> stats = statsClient.getStats(start, end, List.of("/events/" + eventId), false);
         if (!stats.isEmpty()) {
-            dto.setViews(stats.get(0).getHits().intValue());
+            dto.setViews(stats.getFirst().getHits().intValue());
         }
         return dto;
     }

@@ -1,5 +1,6 @@
 package ru.practicum.mainservice.dto.request;
 
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class UpdateEventUserRequest {
     private Location location;
     private String eventDate;
     private Boolean paid;
+    @Positive
     private Integer participantLimit;
     private Boolean requestModeration;
     private String stateAction;

@@ -113,4 +113,16 @@ public class ExceptionController {
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    @ExceptionHandler(InvalidDateException.class)
+    public ResponseEntity<ApiError> handleInvalidDate(InvalidDateException e) {
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message(e.getMessage())
+                .reason("Invalid date format.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.badRequest().body(error);
+    }
 }
