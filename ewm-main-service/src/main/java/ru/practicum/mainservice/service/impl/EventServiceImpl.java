@@ -15,6 +15,7 @@ import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.exception.InvalidDateException;
 import ru.practicum.mainservice.exception.NotFoundException;
+import ru.practicum.mainservice.exception.EventConflictException;
 import ru.practicum.mainservice.model.*;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
@@ -107,6 +108,23 @@ public class EventServiceImpl implements EventService {
         validateEventDateForAdmin(dto.getEventDate());
         Category category = (dto.getCategory() != null) ? getCategoryOrThrow(dto.getCategory()) : null;
         Location location = dto.getLocation();
+        if (dto.getStateAction() != null) {
+            switch (dto.getStateAction()) {
+                case "PUBLISH_EVENT" -> {
+                    if (event.getState() == EventState.PUBLISHED) {
+                        throw new EventConflictException("Event is already published");
+                    }
+                    if (event.getState() == EventState.CANCELED) {
+                        throw new EventConflictException("Cannot publish canceled event");
+                    }
+                }
+                case "REJECT_EVENT" -> {
+                    if (event.getState() == EventState.PUBLISHED) {
+                        throw new EventConflictException("Cannot reject published event");
+                    }
+                }
+            }
+        }
         EventMapper.updateEntityByAdmin(event, dto, category, location);
         return EventMapper.toFullDto(eventRepository.save(event));
     }

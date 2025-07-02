@@ -125,4 +125,16 @@ public class ExceptionController {
                 .build();
         return ResponseEntity.badRequest().body(error);
     }
+
+    @ExceptionHandler(EventConflictException.class)
+    public ResponseEntity<ApiError> handleEventConflict(EventConflictException e) {
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message(e.getMessage())
+                .reason("Event conflict.")
+                .status(HttpStatus.CONFLICT.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 }
