@@ -208,7 +208,6 @@ public class EventServiceImpl implements EventService {
         List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
         LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
         List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
-        saveStatsHit();
         return events.stream().map(event -> {
             EventShortDto dto = EventMapper.toShortDto(event);
             String eventUri = "/events/" + event.getId();
