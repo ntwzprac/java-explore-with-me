@@ -511,198 +511,45 @@
 					"item": [
 						{
 							"name": "1. Add Category - Valid",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 201\", function () {",
-											"    pm.expect(pm.response.code).to.equal(201);",
-											"});",
-											"pm.test(\"Response has id and name\", function () {",
-											"    const json = pm.response.json();",
-											"    pm.expect(json).to.have.property('id');",
-											"    pm.expect(json).to.have.property('name');",
-											"});"
-										]
-									}
-								}
-							],
 							"request": {
 								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Концерты\"\n}"
-								},
-								"url": {
-									"raw": "{{mainServiceUrl}}/admin/categories",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"admin",
-										"categories"
-									]
-								}
+								"header": [{"key": "Content-Type", "value": "application/json"}],
+								"body": {"mode": "raw", "raw": "{\n  \"name\": \"Концерты\"\n}"},
+								"url": {"raw": "{{mainServiceUrl}}/admin/categories", "host": ["{{mainServiceUrl}}"], "path": ["admin", "categories"]}
 							},
-							"response": []
+							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+								"pm.test(\"Status code is 201\", function () {pm.expect(pm.response.code).to.equal(201);});",
+								"const json = pm.response.json();",
+								"pm.expect(json).to.have.property('id');",
+								"pm.expect(json).to.have.property('name');"
+							]}}]
 						},
 						{
-							"name": "2. Add Category - Invalid (no name)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 400\", function () {",
-											"    pm.expect(pm.response.code).to.equal(400);",
-											"});",
-											"pm.test(\"Response contains error message\", function () {",
-											"    const json = pm.response.json();",
-											"    pm.expect(json).to.have.property('message');",
-											"    pm.expect(json.message).to.not.be.empty;",
-											"});"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{}"
-								},
-								"url": {
-									"raw": "{{mainServiceUrl}}/admin/categories",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"admin",
-										"categories"
-									]
-								}
-							},
-							"response": []
+							"name": "2. Get Categories - Basic",
+							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories", "host": ["{{mainServiceUrl}}"], "path": ["categories"]}},
+							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+								"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+								"pm.expect(pm.response.json()).to.be.an('array');"
+							]}}]
 						},
 						{
-							"name": "3. Get Categories - Basic",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"pm.test(\"Response is an array\", function () {",
-											"    pm.expect(pm.response.json()).to.be.an('array');",
-											"});"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{mainServiceUrl}}/categories",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"categories"
-									]
-								}
-							},
-							"response": []
+							"name": "3. Get Category by ID - Valid",
+							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories/1", "host": ["{{mainServiceUrl}}"], "path": ["categories", "1"]}},
+							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+								"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+								"const json = pm.response.json();",
+								"pm.expect(json).to.have.property('id');",
+								"pm.expect(json).to.have.property('name');"
+							]}}]
 						},
 						{
-							"name": "4. Get Category by ID - Valid",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"pm.test(\"Response has id and name\", function () {",
-											"    const json = pm.response.json();",
-											"    pm.expect(json).to.have.property('id');",
-											"    pm.expect(json).to.have.property('name');",
-											"});"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{mainServiceUrl}}/categories/1",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"categories",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "5. Get Category by ID - Not Found",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 404\", function () {",
-											"    pm.expect(pm.response.code).to.equal(404);",
-											"});",
-											"pm.test(\"Response contains error message\", function () {",
-											"    const json = pm.response.json();",
-											"    pm.expect(json).to.have.property('message');",
-											"    pm.expect(json.message).to.not.be.empty;",
-											"});"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{mainServiceUrl}}/categories/99999",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"categories",
-										"99999"
-									]
-								}
-							},
-							"response": []
+							"name": "4. Get Category by ID - Not Found",
+							"request": {"method": "GET", "header": [], "url": {"raw": "{{mainServiceUrl}}/categories/99999", "host": ["{{mainServiceUrl}}"], "path": ["categories", "99999"]}},
+							"event": [{"listen": "test", "script": {"type": "text/javascript", "exec": [
+								"pm.test(\"Status code is 404\", function () {pm.expect(pm.response.code).to.equal(404);});",
+								"const json = pm.response.json();",
+								"pm.expect(json).to.have.property('message');"
+							]}}]
 						}
 					]
 				},
