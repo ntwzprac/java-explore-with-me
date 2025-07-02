@@ -91,35 +91,15 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
-        if (from < 0) from = 0;
-        if (size <= 0) size = 10;
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : List.of();
-        LocalDateTime start;
-        LocalDateTime end;
-        try {
-            start = (rangeStart != null && !rangeStart.isBlank()) ? parseDate(rangeStart) : null;
-        } catch (Exception e) {
-            start = null;
-        }
-        try {
-            end = (rangeEnd != null && !rangeEnd.isBlank()) ? parseDate(rangeEnd) : null;
-        } catch (Exception e) {
-            end = null;
-        }
-        if (start != null && end != null && start.isAfter(end)) {
-            throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
-        }
+        List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
+        LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : null;
+        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
         List<Long> safeUsers = (users != null) ? users : List.of();
         List<EventState> safeStates = (stateEnums != null) ? stateEnums : List.of();
         List<Long> safeCategories = (categories != null) ? categories : List.of();
-        try {
-            return eventRepository.searchEventsAdmin(safeUsers, safeStates, safeCategories, start, end, pageRequest)
-                    .stream().map(EventMapper::toFullDto).toList();
-        } catch (Exception e) {
-            org.slf4j.LoggerFactory.getLogger(EventServiceImpl.class).error("Error in getEventsAdmin", e);
-            throw e;
-        }
+        return eventRepository.searchEventsAdmin(safeUsers, safeStates, safeCategories, start, end, pageRequest)
+                .stream().map(EventMapper::toFullDto).toList();
     }
 
     @Override
@@ -206,46 +186,29 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
-        if (from < 0) from = 0;
-        if (size <= 0) size = 10;
         PageRequest pageRequest = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start;
-        LocalDateTime end;
-        try {
-            start = (rangeStart != null && !rangeStart.isBlank()) ? parseDate(rangeStart) : now;
-        } catch (Exception e) {
-            start = now;
-        }
-        try {
-            end = (rangeEnd != null && !rangeEnd.isBlank()) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
-        } catch (Exception e) {
-            end = LocalDateTime.of(3000, 1, 1, 0, 0);
-        }
+        LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : now;
+        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
         if (end != null && start.isAfter(end)) {
             throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
         }
         List<Long> safeCategories = (categories != null) ? categories : List.of();
-        try {
-            List<Event> events = eventRepository.searchEventsPublic(text, safeCategories, paid, start, end, pageRequest)
-                    .stream()
-                    .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
-                    .toList();
-            events = sortEvents(events, sort);
-            saveStatsHit();
-            List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
-            LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(java.util.Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
-            List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
-            return events.stream().map(event -> {
-                EventShortDto dto = EventMapper.toShortDto(event);
-                String eventUri = "/events/" + event.getId();
-                stats.stream().filter(s -> s.getUri().equals(eventUri)).findFirst().ifPresent(viewStats -> dto.setViews(viewStats.getHits().intValue()));
-                return dto;
-            }).toList();
-        } catch (Exception e) {
-            org.slf4j.LoggerFactory.getLogger(EventServiceImpl.class).error("Error in getEventsPublic", e);
-            throw e;
-        }
+        List<Event> events = eventRepository.searchEventsPublic(text, safeCategories, paid, start, end, pageRequest)
+                .stream()
+                .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
+                .toList();
+        events = sortEvents(events, sort);
+        saveStatsHit();
+        List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
+        LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
+        List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
+        return events.stream().map(event -> {
+            EventShortDto dto = EventMapper.toShortDto(event);
+            String eventUri = "/events/" + event.getId();
+            stats.stream().filter(s -> s.getUri().equals(eventUri)).findFirst().ifPresent(viewStats -> dto.setViews(viewStats.getHits().intValue()));
+            return dto;
+        }).toList();
     }
 
     private List<Event> sortEvents(List<Event> events, String sort) {
