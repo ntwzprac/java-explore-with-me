@@ -96,7 +96,10 @@ public class EventServiceImpl implements EventService {
         List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : null;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
-        return eventRepository.searchEventsAdmin(users, stateEnums, categories, start, end, pageRequest)
+        List<Long> safeUsers = (users != null) ? users : List.of();
+        List<EventState> safeStates = (stateEnums != null) ? stateEnums : List.of();
+        List<Long> safeCategories = (categories != null) ? categories : List.of();
+        return eventRepository.searchEventsAdmin(safeUsers, safeStates, safeCategories, start, end, pageRequest)
                 .stream().map(EventMapper::toFullDto).toList();
     }
 
@@ -191,7 +194,8 @@ public class EventServiceImpl implements EventService {
         if (end != null && start.isAfter(end)) {
             throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
         }
-        List<Event> events = eventRepository.searchEventsPublic(text, categories, paid, start, end, pageRequest)
+        List<Long> safeCategories = (categories != null) ? categories : List.of();
+        List<Event> events = eventRepository.searchEventsPublic(text, safeCategories, paid, start, end, pageRequest)
                 .stream()
                 .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
                 .toList();
