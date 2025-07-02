@@ -93,12 +93,10 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventFullDto> getEventsAdmin(List<Long> users, List<String> states, List<Long> categories, String rangeStart, String rangeEnd, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
-        List<EventState> stateEnums = (states != null) ? states.stream().map(EventState::valueOf).toList() : List.of();
-        List<Long> usersParam = (users != null) ? users : List.of();
-        List<Long> categoriesParam = (categories != null) ? categories : List.of();
-        LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : LocalDateTime.MIN;
-        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.MAX;
-        return eventRepository.searchEventsAdmin(usersParam, stateEnums, categoriesParam, start, end, pageRequest)
+        List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
+        LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : null;
+        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
+        return eventRepository.searchEventsAdmin(users, stateEnums, categories, start, end, pageRequest)
                 .stream().map(EventMapper::toFullDto).toList();
     }
 
@@ -188,13 +186,12 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
-        List<Long> categoriesParam = (categories != null) ? categories : List.of();
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : now;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
         if (end != null && start.isAfter(end)) {
             throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
         }
-        List<Event> events = eventRepository.searchEventsPublic(text, categoriesParam, paid, start, end, pageRequest)
+        List<Event> events = eventRepository.searchEventsPublic(text, categories, paid, start, end, pageRequest)
                 .stream()
                 .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
                 .toList();
