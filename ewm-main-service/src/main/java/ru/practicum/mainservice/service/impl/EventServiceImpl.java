@@ -187,7 +187,7 @@ public class EventServiceImpl implements EventService {
         PageRequest pageRequest = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : now;
-        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
+        LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
         if (end != null && start.isAfter(end)) {
             throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
         }
