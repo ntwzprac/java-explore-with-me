@@ -199,7 +199,6 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto getEventPublic(Long eventId) {
-        saveStatsHit();
         Event event = getEventOrThrow(eventId);
         if (event.getState() != EventState.PUBLISHED) {
             throw new NotFoundException("Event is not published");
@@ -207,10 +206,11 @@ public class EventServiceImpl implements EventService {
         EventFullDto dto = EventMapper.toFullDto(event);
         LocalDateTime start = event.getPublishedOn() != null ? event.getPublishedOn() : LocalDateTime.now().minusYears(1);
         LocalDateTime end = LocalDateTime.now();
-        List<ViewStats> stats = statsClient.getStats(start, end, List.of("/events/" + eventId), false);
+        List<ViewStats> stats = statsClient.getStats(start, end, List.of("/events/" + eventId), true);
         if (!stats.isEmpty()) {
             dto.setViews(stats.getFirst().getHits().intValue());
         }
+        saveStatsHit();
         return dto;
     }
 }
