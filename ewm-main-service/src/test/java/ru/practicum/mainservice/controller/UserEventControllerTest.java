@@ -12,6 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.service.EventService;
+import ru.practicum.mainservice.dto.response.EventFullDto;
+import ru.practicum.mainservice.dto.response.CategoryDto;
+import ru.practicum.mainservice.dto.response.UserShortDto;
+import ru.practicum.mainservice.model.Location;
+import ru.practicum.mainservice.dto.request.NewEventDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +59,7 @@ class UserEventControllerTest {
 
     @Test
     void getUserEventById_ShouldReturnEventFullDto() throws Exception {
-        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder()
+        var eventFullDto = EventFullDto.builder()
                 .id(1L)
                 .title("event1")
                 .build();
@@ -69,23 +74,23 @@ class UserEventControllerTest {
 
     @Test
     void addEvent_ShouldReturnCreatedEventFullDto() throws Exception {
-        var newEvent = ru.practicum.mainservice.dto.request.NewEventDto.builder()
+        var newEvent = NewEventDto.builder()
                 .title("event1")
                 .annotation("Some valid annotation for the event.")
                 .description("Some valid description for the event, at least 20 characters long.")
                 .eventDate("2030-01-01T12:00:00")
-                .location(ru.practicum.mainservice.model.Location.builder().lat(10.0f).lon(20.0f).build())
+                .location(Location.builder().lat(10.0f).lon(20.0f).build())
                 .category(1L)
                 .build();
-        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder()
+        var eventFullDto = EventFullDto.builder()
                 .id(1L)
                 .title("event1")
                 .annotation("Some valid annotation for the event.")
                 .description("Some valid description for the event, at least 20 characters long.")
                 .eventDate("2030-01-01T12:00:00")
-                .location(ru.practicum.mainservice.model.Location.builder().lat(10.0f).lon(20.0f).build())
-                .category(ru.practicum.mainservice.dto.response.CategoryDto.builder().id(1L).name("Category1").build())
-                .initiator(ru.practicum.mainservice.dto.response.UserShortDto.builder().id(1L).name("User1").build())
+                .location(Location.builder().lat(10.0f).lon(20.0f).build())
+                .category(CategoryDto.builder().id(1L).name("Category1").build())
+                .initiator(UserShortDto.builder().id(1L).name("User1").build())
                 .paid(false)
                 .participantLimit(0)
                 .requestModeration(true)

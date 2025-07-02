@@ -12,6 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.service.EventService;
+import ru.practicum.mainservice.dto.response.EventFullDto;
+import ru.practicum.mainservice.dto.response.CategoryDto;
+import ru.practicum.mainservice.dto.response.UserShortDto;
+import ru.practicum.mainservice.model.Location;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,14 +58,14 @@ class EventControllerTest {
 
     @Test
     void getEventById_ShouldReturnEventFullDto() throws Exception {
-        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder()
+        var eventFullDto = EventFullDto.builder()
                 .id(1L)
                 .title("event1")
                 .annotation("annotation")
                 .description("desc")
-                .category(ru.practicum.mainservice.dto.response.CategoryDto.builder().id(1L).name("cat").build())
-                .initiator(ru.practicum.mainservice.dto.response.UserShortDto.builder().id(1L).name("user").build())
-                .location(ru.practicum.mainservice.model.Location.builder().lat(10.0f).lon(20.0f).build())
+                .category(CategoryDto.builder().id(1L).name("cat").build())
+                .initiator(UserShortDto.builder().id(1L).name("user").build())
+                .location(Location.builder().lat(10.0f).lon(20.0f).build())
                 .paid(false)
                 .participantLimit(100)
                 .requestModeration(false)
