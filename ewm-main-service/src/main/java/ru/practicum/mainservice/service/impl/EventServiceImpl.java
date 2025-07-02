@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -95,9 +96,9 @@ public class EventServiceImpl implements EventService {
         List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : null;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
-        List<Long> safeUsers = (users != null) ? users : List.of();
-        List<EventState> safeStates = (stateEnums != null) ? stateEnums : List.of();
-        List<Long> safeCategories = (categories != null) ? categories : List.of();
+        List<Long> safeUsers = (users != null && !users.isEmpty()) ? users : null;
+        List<EventState> safeStates = (stateEnums != null && !stateEnums.isEmpty()) ? stateEnums : null;
+        List<Long> safeCategories = (categories != null && !categories.isEmpty()) ? categories : null;
         return eventRepository.searchEventsAdmin(safeUsers, safeStates, safeCategories, start, end, pageRequest)
                 .stream().map(EventMapper::toFullDto).toList();
     }
@@ -190,10 +191,10 @@ public class EventServiceImpl implements EventService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : now;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
-        if (end != null && start.isAfter(end)) {
-            throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
+        if (start.isAfter(end)) {
+            throw new InvalidDateException("rangeStart can't be after rangeEnd");
         }
-        List<Long> safeCategories = (categories != null) ? categories : List.of();
+        List<Long> safeCategories = (categories != null && !categories.isEmpty()) ? categories : null;
         List<Event> events = eventRepository.searchEventsPublic(text, safeCategories, paid, start, end, pageRequest)
                 .stream()
                 .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
