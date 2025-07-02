@@ -20,7 +20,6 @@ import ru.practicum.mainservice.service.ParticipationRequestService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,7 +128,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .rejectedRequests(rejected)
                 .build();
     }
-    
+
     private User getUserOrThrow(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found: " + userId));
