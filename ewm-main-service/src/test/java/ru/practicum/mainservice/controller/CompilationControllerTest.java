@@ -51,4 +51,16 @@ class CompilationControllerTest {
                 .andExpect(jsonPath("$[0].title").value("compilation1"));
         verify(compilationService, times(1)).getCompilations(any(), anyInt(), anyInt());
     }
+
+    @Test
+    void getCompilationById_ShouldReturnCompilationDto() throws Exception {
+        CompilationDto compilation = CompilationDto.builder().id(1L).title("compilation1").build();
+        when(compilationService.getCompilation(1L)).thenReturn(compilation);
+        mockMvc.perform(get("/compilations/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value("compilation1"));
+        verify(compilationService, times(1)).getCompilation(1L);
+    }
 }

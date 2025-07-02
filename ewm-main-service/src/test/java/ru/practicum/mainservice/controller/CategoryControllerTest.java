@@ -51,4 +51,16 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$[0].name").value("cat1"));
         verify(categoryService, times(1)).getCategories(0, 10);
     }
+
+    @Test
+    void getCategoryById_ShouldReturnCategoryDto() throws Exception {
+        CategoryDto category = CategoryDto.builder().id(1L).name("cat1").build();
+        when(categoryService.getCategory(1L)).thenReturn(category);
+        mockMvc.perform(get("/categories/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("cat1"));
+        verify(categoryService, times(1)).getCategory(1L);
+    }
 }

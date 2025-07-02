@@ -51,4 +51,34 @@ class UserEventControllerTest {
                 .andExpect(jsonPath("$[0].title").value("event1"));
         verify(eventService, times(1)).getUserEvents(anyLong(), anyInt(), anyInt());
     }
+
+    @Test
+    void getUserEventById_ShouldReturnEventFullDto() throws Exception {
+        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder()
+                .id(1L)
+                .title("event1")
+                .build();
+        when(eventService.getUserEvent(1L, 2L)).thenReturn(eventFullDto);
+        mockMvc.perform(get("/users/1/events/2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value("event1"));
+        verify(eventService, times(1)).getUserEvent(1L, 2L);
+    }
+
+    @Test
+    void addEvent_ShouldReturnCreatedEventFullDto() throws Exception {
+        var newEvent = ru.practicum.mainservice.dto.request.NewEventDto.builder().title("event1").build();
+        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder().id(1L).title("event1").build();
+        when(eventService.addEvent(eq(1L), any())).thenReturn(eventFullDto);
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/users/1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newEvent)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value("event1"));
+        verify(eventService, times(1)).addEvent(eq(1L), any());
+    }
 }
