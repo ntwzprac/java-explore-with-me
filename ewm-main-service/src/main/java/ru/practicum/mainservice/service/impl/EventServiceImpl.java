@@ -13,9 +13,9 @@ import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.ConflictException;
+import ru.practicum.mainservice.exception.EventConflictException;
 import ru.practicum.mainservice.exception.InvalidDateException;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.exception.EventConflictException;
 import ru.practicum.mainservice.model.*;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
@@ -34,6 +34,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -41,8 +42,6 @@ public class EventServiceImpl implements EventService {
     private final HttpServletRequest httpServletRequest;
     @Value("${spring.application.name}")
     private String appName;
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private LocalDateTime parseDate(String dateStr) {
         return LocalDateTime.parse(dateStr, DATE_FORMATTER);
