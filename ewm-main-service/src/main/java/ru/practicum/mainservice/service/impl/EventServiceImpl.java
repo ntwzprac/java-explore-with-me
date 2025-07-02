@@ -145,6 +145,9 @@ public class EventServiceImpl implements EventService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : now;
         LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new InvalidDateException("rangeStart не может быть позже rangeEnd");
+        }
         List<Event> events = eventRepository.searchEventsPublic(text, categories, paid, start, end, pageRequest)
                 .stream()
                 .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())

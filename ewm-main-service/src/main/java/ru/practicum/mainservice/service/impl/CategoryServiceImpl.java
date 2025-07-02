@@ -11,6 +11,7 @@ import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.repository.CategoryRepository;
+import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.service.CategoryService;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
     @Override
     @Transactional
@@ -37,6 +39,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long catId) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category not found: " + catId));
+        if (eventRepository.existsByCategory_Id(catId)) {
+            throw new ConflictException("Нельзя удалить категорию, к которой привязаны события");
+        }
         categoryRepository.delete(category);
     }
 
