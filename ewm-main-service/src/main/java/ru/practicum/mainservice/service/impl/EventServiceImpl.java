@@ -96,9 +96,11 @@ public class EventServiceImpl implements EventService {
         List<EventState> stateEnums = (states != null && !states.isEmpty()) ? states.stream().map(EventState::valueOf).toList() : null;
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : null;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : null;
-        List<Long> safeUsers = (users != null && !users.isEmpty()) ? users : null;
-        List<EventState> safeStates = (stateEnums != null && !stateEnums.isEmpty()) ? stateEnums : null;
-        List<Long> safeCategories = (categories != null && !categories.isEmpty()) ? categories : null;
+
+        List<Long> safeUsers = (users == null || users.isEmpty()) ? null : users;
+        List<EventState> safeStates = (stateEnums == null || stateEnums.isEmpty()) ? null : stateEnums;
+        List<Long> safeCategories = (categories == null || categories.isEmpty()) ? null : categories;
+
         return eventRepository.searchEventsAdmin(safeUsers, safeStates, safeCategories, start, end, pageRequest)
                 .stream().map(EventMapper::toFullDto).toList();
     }
@@ -194,8 +196,11 @@ public class EventServiceImpl implements EventService {
         if (start.isAfter(end)) {
             throw new InvalidDateException("rangeStart can't be after rangeEnd");
         }
-        List<Long> safeCategories = (categories != null && !categories.isEmpty()) ? categories : null;
-        List<Event> events = eventRepository.searchEventsPublic(text, safeCategories, paid, start, end, pageRequest)
+
+        List<Long> safeCategories = (categories == null || categories.isEmpty()) ? null : categories;
+        String safeText = (text == null || text.trim().isEmpty()) ? null : text.trim();
+
+        List<Event> events = eventRepository.searchEventsPublic(safeText, safeCategories, paid, start, end, pageRequest)
                 .stream()
                 .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
                 .toList();

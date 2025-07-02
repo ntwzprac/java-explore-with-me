@@ -24,12 +24,12 @@ public class Event {
     @Column(nullable = false, length = 120)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     @Size(max = 2000, message = "Annotation cannot exceed 2000 symbols")
     @NotBlank
     private String annotation;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     @Size(max = 7000, message = "Description cannot exceed 7000 symbols")
     @NotBlank
     private String description;
