@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -35,12 +34,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+        User user = getUserOrThrow(userId);
         userRepository.delete(user);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getUsers(List<Long> ids, int from, int size) {
         List<User> users;
         if (ids == null || ids.isEmpty()) {
@@ -49,5 +48,10 @@ public class UserServiceImpl implements UserService {
             users = userRepository.findAllById(ids);
         }
         return users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+    }
+
+    private User getUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found: " + userId));
     }
 }
