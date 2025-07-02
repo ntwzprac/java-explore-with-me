@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
@@ -37,8 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category not found: " + catId));
+        Category category = getCategoryOrThrow(catId);
         if (eventRepository.existsByCategory_Id(catId)) {
             throw new ConflictException("Нельзя удалить категорию, к которой привязаны события");
         }
@@ -48,8 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto dto) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category not found: " + catId));
+        Category category = getCategoryOrThrow(catId);
         if (!category.getName().equals(dto.getName()) && categoryRepository.existsByName(dto.getName())) {
             throw new ConflictException("Category name must be unique");
         }
@@ -58,6 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryDto> getCategories(int from, int size) {
         return categoryRepository.findAll(PageRequest.of(from / size, size)).stream()
                 .map(CategoryMapper::toDto)
@@ -65,8 +63,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryDto getCategory(Long catId) {
-        return CategoryMapper.toDto(categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Category not found: " + catId)));
+        return CategoryMapper.toDto(getCategoryOrThrow(catId));
+    }
+
+    private Category getCategoryOrThrow(Long catId) {
+        return categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Category not found: " + catId));
     }
 }
