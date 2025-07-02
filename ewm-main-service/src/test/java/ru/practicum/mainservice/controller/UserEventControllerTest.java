@@ -69,8 +69,27 @@ class UserEventControllerTest {
 
     @Test
     void addEvent_ShouldReturnCreatedEventFullDto() throws Exception {
-        var newEvent = ru.practicum.mainservice.dto.request.NewEventDto.builder().title("event1").build();
-        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder().id(1L).title("event1").build();
+        var newEvent = ru.practicum.mainservice.dto.request.NewEventDto.builder()
+                .title("event1")
+                .annotation("Some valid annotation for the event.")
+                .description("Some valid description for the event, at least 20 characters long.")
+                .eventDate("2030-01-01T12:00:00")
+                .location(ru.practicum.mainservice.model.Location.builder().lat(10.0f).lon(20.0f).build())
+                .category(1L)
+                .build();
+        var eventFullDto = ru.practicum.mainservice.dto.response.EventFullDto.builder()
+                .id(1L)
+                .title("event1")
+                .annotation("Some valid annotation for the event.")
+                .description("Some valid description for the event, at least 20 characters long.")
+                .eventDate("2030-01-01T12:00:00")
+                .location(ru.practicum.mainservice.model.Location.builder().lat(10.0f).lon(20.0f).build())
+                .category(ru.practicum.mainservice.dto.response.CategoryDto.builder().id(1L).name("Category1").build())
+                .initiator(ru.practicum.mainservice.dto.response.UserShortDto.builder().id(1L).name("User1").build())
+                .paid(false)
+                .participantLimit(0)
+                .requestModeration(true)
+                .build();
         when(eventService.addEvent(eq(1L), any())).thenReturn(eventFullDto);
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/users/1/events")
                         .contentType(MediaType.APPLICATION_JSON)

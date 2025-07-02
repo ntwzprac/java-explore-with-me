@@ -12,6 +12,8 @@ import ru.practicum.mainservice.dto.request.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
 import ru.practicum.mainservice.dto.response.EventFullDto;
 import ru.practicum.mainservice.dto.response.EventShortDto;
+import ru.practicum.mainservice.exception.ConflictException;
+import ru.practicum.mainservice.exception.InvalidDateException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Category;
 import ru.practicum.mainservice.model.Event;
@@ -159,7 +161,7 @@ class EventServiceImplTest {
         Category category = mock(Category.class);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
-        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.addEvent(1L, dto));
+        assertThrows(InvalidDateException.class, () -> eventService.addEvent(1L, dto));
     }
 
     @Test
@@ -168,7 +170,7 @@ class EventServiceImplTest {
         Event event = mock(Event.class);
         when(eventRepository.findById(anyLong())).thenReturn(Optional.of(event));
         when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateEventAdmin(1L, dto));
+        assertThrows(InvalidDateException.class, () -> eventService.updateEventAdmin(1L, dto));
     }
 
     @Test
@@ -191,7 +193,7 @@ class EventServiceImplTest {
         when(event.getInitiator()).thenReturn(user);
         when(user.getId()).thenReturn(1L);
         when(event.getState()).thenReturn(EventState.PUBLISHED);
-        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
+        assertThrows(ConflictException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
     }
 
     @Test
@@ -204,7 +206,7 @@ class EventServiceImplTest {
         when(user.getId()).thenReturn(1L);
         when(event.getState()).thenReturn(EventState.PENDING);
         when(dto.getEventDate()).thenReturn(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        assertThrows(ru.practicum.mainservice.exception.ConflictException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
+        assertThrows(InvalidDateException.class, () -> eventService.updateUserEvent(1L, 1L, dto));
     }
 
     @Test
