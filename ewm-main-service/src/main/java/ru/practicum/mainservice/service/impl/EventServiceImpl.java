@@ -3,6 +3,7 @@ package ru.practicum.mainservice.service.impl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +28,10 @@ import ru.practicum.statsdto.ViewStats;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -197,32 +199,54 @@ public class EventServiceImpl implements EventService {
             throw new InvalidDateException("rangeStart can't be after rangeEnd");
         }
 
+        String safeText = (text == null || text.isBlank()) ? null : text.toLowerCase();
         List<Long> safeCategories = (categories == null || categories.isEmpty()) ? null : categories;
-        String safeText = (text == null || text.trim().isEmpty()) ? null : text.trim();
 
-        List<Event> events = eventRepository.searchEventsPublic(safeText, safeCategories, paid, start, end, pageRequest)
-                .stream()
-                .filter(event -> !Boolean.TRUE.equals(onlyAvailable) || event.getParticipantLimit() == 0 || event.getConfirmedRequests() < event.getParticipantLimit())
-                .toList();
-        events = sortEvents(events, sort);
-        List<String> uris = events.stream().map(e -> "/events/" + e.getId()).toList();
-        LocalDateTime statsStart = events.stream().map(Event::getPublishedOn).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(now.minusYears(1));
-        List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
         saveStatsHit();
-        return events.stream().map(event -> {
-            EventShortDto dto = EventMapper.toShortDto(event);
+
+        Page<Event> eventsPage = eventRepository.searchEventsPublic(safeText, safeCategories, paid, start, end, pageRequest);
+        List<Event> resultEvents = new ArrayList<>(eventsPage.getContent());
+
+        if (onlyAvailable != null && onlyAvailable) {
+            resultEvents = resultEvents.stream()
+                    .filter(event -> event.getParticipantLimit() == 0 ||
+                            event.getParticipantLimit() > event.getConfirmedRequests())
+                    .collect(Collectors.toList());
+        }
+
+        List<String> uris = resultEvents.stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
+
+        LocalDateTime statsStart = resultEvents.stream()
+                .map(Event::getPublishedOn)
+                .filter(java.util.Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(now.minusYears(1));
+
+        List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
+
+        resultEvents.forEach(event -> {
             String eventUri = "/events/" + event.getId();
-            stats.stream().filter(s -> s.getUri().equals(eventUri)).findFirst().ifPresent(viewStats -> dto.setViews(viewStats.getHits().intValue()));
-            return dto;
-        }).toList();
+            stats.stream()
+                    .filter(s -> s.getUri().equals(eventUri))
+                    .findFirst()
+                    .ifPresent(viewStats -> event.setViews(viewStats.getHits().intValue()));
+        });
+
+        return sortEvents(resultEvents, sort).stream()
+                .map(EventMapper::toShortDto)
+                .collect(Collectors.toList());
     }
 
     private List<Event> sortEvents(List<Event> events, String sort) {
-        if ("VIEWS".equals(sort)) {
-            return events.stream().sorted((e1, e2) -> Integer.compare(e2.getViews(), e1.getViews())).toList();
-        } else {
-            return events.stream().sorted(Comparator.comparing(Event::getEventDate)).toList();
+        if (sort != null) {
+            switch (sort) {
+                case "EVENT_DATE" -> events.sort(Comparator.comparing(Event::getEventDate));
+                case "VIEWS" -> events.sort(Comparator.comparing(Event::getViews).reversed());
+            }
         }
+        return events;
     }
 
     @Override
