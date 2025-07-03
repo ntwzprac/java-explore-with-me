@@ -94,8 +94,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         List<ParticipationRequest> requests = requestRepository.findAllByIdIn(req.getRequestIds());
         List<ParticipationRequestDto> confirmed = new ArrayList<>();
         List<ParticipationRequestDto> rejected = new ArrayList<>();
+        List<ParticipationRequest> toSave = new ArrayList<>();
+        
         int limit = event.getParticipantLimit();
         int confirmedCount = event.getConfirmedRequests();
+        
         for (ParticipationRequest r : requests) {
             if (!STATUS_PENDING.equals(r.getStatus())) {
                 throw new ConflictException("Request must have status PENDING");
@@ -103,26 +106,32 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             if (STATUS_CONFIRMED.equals(req.getStatus())) {
                 if (limit == 0 || confirmedCount < limit) {
                     r.setStatus(STATUS_CONFIRMED);
-                    confirmed.add(ParticipationRequestMapper.toDto(requestRepository.save(r)));
+                    confirmed.add(ParticipationRequestMapper.toDto(r));
                     confirmedCount++;
                 } else {
                     r.setStatus(STATUS_REJECTED);
-                    rejected.add(ParticipationRequestMapper.toDto(requestRepository.save(r)));
+                    rejected.add(ParticipationRequestMapper.toDto(r));
                 }
             } else if (STATUS_REJECTED.equals(req.getStatus())) {
                 r.setStatus(STATUS_REJECTED);
-                rejected.add(ParticipationRequestMapper.toDto(requestRepository.save(r)));
+                rejected.add(ParticipationRequestMapper.toDto(r));
             }
+            toSave.add(r);
         }
+
         if (limit != 0 && confirmedCount >= limit) {
             List<ParticipationRequest> pending = requestRepository.findByEventIdAndStatus(eventId, STATUS_PENDING);
             for (ParticipationRequest r : pending) {
                 r.setStatus(STATUS_REJECTED);
-                rejected.add(ParticipationRequestMapper.toDto(requestRepository.save(r)));
+                rejected.add(ParticipationRequestMapper.toDto(r));
+                toSave.add(r);
             }
         }
+
+        requestRepository.saveAll(toSave);
         event.setConfirmedRequests(confirmedCount);
         eventRepository.save(event);
+        
         return EventRequestStatusUpdateResult.builder()
                 .confirmedRequests(confirmed)
                 .rejectedRequests(rejected)
