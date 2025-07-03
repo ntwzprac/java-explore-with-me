@@ -29,10 +29,10 @@ public class EventParticipationRequestController {
     public EventRequestStatusUpdateResult changeRequestStatus(@PathVariable Long userId,
                                                               @PathVariable Long eventId,
                                                               @RequestBody EventRequestStatusUpdateRequest request) {
-        log.info("Updating participation request status for event id: {}, user id: {}, new status: {}", 
+        log.info("Updating participation request status for event id: {}, user id: {}, new status: {}",
                 eventId, userId, request.getStatus());
         EventRequestStatusUpdateResult result = requestService.changeRequestStatus(userId, eventId, request);
-        log.info("Updated request statuses: confirmed - {}, rejected - {}", 
+        log.info("Updated request statuses: confirmed - {}, rejected - {}",
                 result.getConfirmedRequests().size(), result.getRejectedRequests().size());
         return result;
     }

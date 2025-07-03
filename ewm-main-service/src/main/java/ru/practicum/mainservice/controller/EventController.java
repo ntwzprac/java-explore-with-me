@@ -29,7 +29,7 @@ public class EventController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("Getting events with parameters: text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, " +
-                "onlyAvailable={}, sort={}, from={}, size={}", 
+                "onlyAvailable={}, sort={}, from={}, size={}",
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         List<EventShortDto> events = eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         log.info("Found {} events", events.size());

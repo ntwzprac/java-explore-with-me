@@ -95,10 +95,10 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         List<ParticipationRequestDto> confirmed = new ArrayList<>();
         List<ParticipationRequestDto> rejected = new ArrayList<>();
         List<ParticipationRequest> toSave = new ArrayList<>();
-        
+
         int limit = event.getParticipantLimit();
         int confirmedCount = event.getConfirmedRequests();
-        
+
         for (ParticipationRequest r : requests) {
             if (!STATUS_PENDING.equals(r.getStatus())) {
                 throw new ConflictException("Request must have status PENDING");
@@ -131,7 +131,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         requestRepository.saveAll(toSave);
         event.setConfirmedRequests(confirmedCount);
         eventRepository.save(event);
-        
+
         return EventRequestStatusUpdateResult.builder()
                 .confirmedRequests(confirmed)
                 .rejectedRequests(rejected)
