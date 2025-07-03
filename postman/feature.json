@@ -1,614 +1,1420 @@
 {
-  "collection": {
-    "info": {
-      "_postman_id": "explore-with-me-stats",
-      "name": "ExploreWithMe Stats Service",
-      "description": "",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "item": [
-      {
-        "name": "Stats Service Tests",
-        "item": [
-          {
-            "name": "1. Save Hit - Valid Request",
-            "request": {
-              "method": "POST",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
-              },
-              "url": {
-                "raw": "{{baseUrl}}/hit",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "hit"
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 201\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(201);",
-                    "});",
-                    "",
-                    "pm.test(\"Response time is less than 1000ms\", function () {",
-                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
-                    "});",
-                    "",
-                    "pm.test(\"Response body is empty\", function () {",
-                    "    pm.expect(pm.response.text()).to.be.empty;",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "2. Save Hit - Invalid Request (Missing App)",
-            "request": {
-              "method": "POST",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
-              },
-              "url": {
-                "raw": "{{baseUrl}}/hit",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "hit"
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 400 for invalid request\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(400);",
-                    "});",
-                    "",
-                    "pm.test(\"Response contains error message\", function () {",
-                    "    const responseBody = pm.response.json();",
-                    "    pm.expect(responseBody).to.have.property('message');",
-                    "    pm.expect(responseBody.message).to.not.be.empty;",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "3. Save Hit - Invalid Request (Invalid Timestamp)",
-            "request": {
-              "method": "POST",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "body": {
-                "mode": "raw",
-                "raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"invalid-date\"\n}"
-              },
-              "url": {
-                "raw": "{{baseUrl}}/hit",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "hit"
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 400 for invalid timestamp\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(400);",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "4. Get Stats - Basic Request",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ],
-                "query": [
-                  {
-                    "key": "start",
-                    "value": "2024-01-01%2000:00:00"
-                  },
-                  {
-                    "key": "end",
-                    "value": "2024-12-31%2023:59:59"
-                  }
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 200\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(200);",
-                    "});",
-                    "",
-                    "pm.test(\"Response is an array\", function () {",
-                    "    pm.expect(pm.response.json()).to.be.an('array');",
-                    "});",
-                    "",
-                    "pm.test(\"Response time is less than 1000ms\", function () {",
-                    "    pm.expect(pm.response.responseTime).to.be.below(1000);",
-                    "});",
-                    "",
-                    "pm.test(\"Each item has required properties\", function () {",
-                    "    const response = pm.response.json();",
-                    "    if (response.length > 0) {",
-                    "        response.forEach(item => {",
-                    "            pm.expect(item).to.have.property('app');",
-                    "            pm.expect(item).to.have.property('uri');",
-                    "            pm.expect(item).to.have.property('hits');",
-                    "            pm.expect(item.hits).to.be.a('number');",
-                    "        });",
-                    "    }",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "5. Get Stats - With URIs Filter",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&uris=%2Fevents%2F2",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ],
-                "query": [
-                  {
-                    "key": "start",
-                    "value": "2024-01-01%2000:00:00"
-                  },
-                  {
-                    "key": "end",
-                    "value": "2024-12-31%2023:59:59"
-                  },
-                  {
-                    "key": "uris",
-                    "value": "%2Fevents%2F1"
-                  },
-                  {
-                    "key": "uris",
-                    "value": "%2Fevents%2F2"
-                  }
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 200\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(200);",
-                    "});",
-                    "",
-                    "pm.test(\"Response is an array\", function () {",
-                    "    pm.expect(pm.response.json()).to.be.an('array');",
-                    "});",
-                    "",
-                    "pm.test(\"All returned URIs match requested ones\", function () {",
-                    "    const response = pm.response.json();",
-                    "    const requestedUris = ['/events/1', '/events/2'];",
-                    "    response.forEach(item => {",
-                    "        pm.expect(requestedUris).to.include(item.uri);",
-                    "    });",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "6. Get Stats - Unique Hits",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&unique=true",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ],
-                "query": [
-                  {
-                    "key": "start",
-                    "value": "2024-01-01%2000:00:00"
-                  },
-                  {
-                    "key": "end",
-                    "value": "2024-12-31%2023:59:59"
-                  },
-                  {
-                    "key": "unique",
-                    "value": "true"
-                  }
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 200\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(200);",
-                    "});",
-                    "",
-                    "pm.test(\"Response is an array\", function () {",
-                    "    pm.expect(pm.response.json()).to.be.an('array');",
-                    "});",
-                    "",
-                    "pm.test(\"Each item has required properties\", function () {",
-                    "    const response = pm.response.json();",
-                    "    if (response.length > 0) {",
-                    "        response.forEach(item => {",
-                    "            pm.expect(item).to.have.property('app');",
-                    "            pm.expect(item).to.have.property('uri');",
-                    "            pm.expect(item).to.have.property('hits');",
-                    "            pm.expect(item.hits).to.be.a('number');",
-                    "            pm.expect(item.hits).to.be.at.least(0);",
-                    "        });",
-                    "    }",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "7. Get Stats - Complete Flow Test",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&unique=true",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ],
-                "query": [
-                  {
-                    "key": "start",
-                    "value": "2024-01-01%2000:00:00"
-                  },
-                  {
-                    "key": "end",
-                    "value": "2024-12-31%2023:59:59"
-                  },
-                  {
-                    "key": "uris",
-                    "value": "%2Fevents%2F1"
-                  },
-                  {
-                    "key": "unique",
-                    "value": "true"
-                  }
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 200\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(200);",
-                    "});",
-                    "",
-                    "pm.test(\"Response is an array\", function () {",
-                    "    pm.expect(pm.response.json()).to.be.an('array');",
-                    "});",
-                    "",
-                    "pm.test(\"All returned URIs match requested URI\", function () {",
-                    "    const response = pm.response.json();",
-                    "    response.forEach(item => {",
-                    "        pm.expect(item.uri).to.equal('/events/1');",
-                    "    });",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "8. Get Stats - Invalid Date Range",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats?start=2024-12-31%2023:59:59&end=2024-01-01%2000:00:00",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ],
-                "query": [
-                  {
-                    "key": "start",
-                    "value": "2024-12-31%2023:59:59"
-                  },
-                  {
-                    "key": "end",
-                    "value": "2024-01-01%2000:00:00"
-                  }
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 400 for invalid date range\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(400);",
-                    "});",
-                    "",
-                    "pm.test(\"Response contains ErrorResponse structure\", function () {",
-                    "    const responseBody = pm.response.json();",
-                    "    pm.expect(responseBody).to.have.property('message');",
-                    "    pm.expect(responseBody).to.have.property('timestamp');",
-                    "    pm.expect(responseBody).to.have.property('status');",
-                    "    pm.expect(responseBody.message).to.equal('Start date must be before end date');",
-                    "    pm.expect(responseBody.status).to.equal(400);",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "9. Get Stats - Missing Required Parameters",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/stats",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "stats"
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 400 for missing parameters\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(400);",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "name": "10. Health Check",
-            "request": {
-              "method": "GET",
-              "header": [],
-              "url": {
-                "raw": "{{baseUrl}}/actuator/health",
-                "host": [
-                  "{{baseUrl}}"
-                ],
-                "path": [
-                  "actuator",
-                  "health"
-                ]
-              }
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status code is 200\", function () {",
-                    "    pm.expect(pm.response.code).to.equal(200);",
-                    "});",
-                    "",
-                    "pm.test(\"Health check response structure\", function () {",
-                    "    const response = pm.response.json();",
-                    "    pm.expect(response).to.have.property('status');",
-                    "    pm.expect(response.status).to.be.oneOf(['UP', 'DOWN']);",
-                    "});",
-                    "",
-                    "pm.test(\"Service is UP\", function () {",
-                    "    const response = pm.response.json();",
-                    "    pm.expect(response.status).to.equal('UP');",
-                    "});"
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "event": [
-      {
-        "listen": "prerequest",
-        "script": {
-          "type": "text/javascript",
-          "exec": [
-            "console.log('Starting request to: ' + pm.request.url);"
-          ]
-        }
-      },
-      {
-        "listen": "test",
-        "script": {
-          "type": "text/javascript",
-          "exec": [
-            "pm.test(\"Response time is reasonable\", function () {",
-            "    pm.expect(pm.response.responseTime).to.be.below(5000);",
-            "});",
-            "",
-            "pm.test(\"Response has valid JSON\", function () {",
-            "    if (pm.response.headers.get(\"Content-Type\") && pm.response.headers.get(\"Content-Type\").includes(\"application/json\")) {",
-            "        pm.expect(() => pm.response.json()).to.not.throw();",
-            "    }",
-            "});"
-          ]
-        }
-      }
-    ],
-    "variable": [
-      {
-        "key": "baseUrl",
-        "value": "http://localhost:9090"
-      }
-    ]
-  },
-  "environment": {
-    "id": "explore-with-me-env",
-    "name": "ExploreWithMe Environment",
-    "values": [
-      {
-        "key": "baseUrl",
-        "value": "http://localhost:9090",
-        "type": "default",
-        "enabled": true
-      },
-      {
-        "key": "statsServiceUrl",
-        "value": "http://localhost:9090",
-        "type": "default",
-        "enabled": true
-      },
-      {
-        "key": "mainServiceUrl",
-        "value": "http://localhost:8080",
-        "type": "default",
-        "enabled": true
-      }
-    ],
-    "_postman_variable_scope": "environment",
-    "_postman_exported_at": "2024-01-01T00:00:00.000Z",
-    "_postman_exported_using": "Postman/10.0.0"
-  },
-  "metadata": {
-    "description": "Postman тесты для сервиса статистики ExploreWithMe с полным набором тестов и DTO",
-    "version": "3.0.0",
-    "author": "ExploreWithMe Team",
-    "setup": [
-      "1. Импортируйте этот файл в Postman",
-      "2. Выберите environment 'ExploreWithMe Environment'",
-      "3. Запустите сервис статистики: mvn spring-boot:run -pl ewm-stats-service/ewm-stats-service -Dspring-boot.run.profiles=dev",
-      "4. Выполните тесты в порядке: сначала Save Hit, затем Get Stats"
-    ],
-    "testScenarios": {
-      "Valid Requests": [
-        "Save Hit - Valid Request",
-        "Get Stats - Basic Request",
-        "Get Stats - With URIs Filter",
-        "Get Stats - Unique Hits",
-        "Get Stats - Complete Flow Test",
-        "Health Check"
-      ],
-      "Error Handling": [
-        "Save Hit - Invalid Request (Missing App)",
-        "Save Hit - Invalid Request (Invalid Timestamp)",
-        "Get Stats - Invalid Date Range",
-        "Get Stats - Missing Required Parameters"
-      ]
-    },
-    "endpoints": {
-      "POST /hit": "Сохранение информации о запросе к эндпоинту",
-      "GET /stats": "Получение статистики за период",
-      "GET /actuator/health": "Проверка состояния сервиса"
-    },
-    "testCoverage": {
-      "Positive Testing": "Проверка корректных запросов и ответов",
-      "Negative Testing": "Проверка обработки ошибок и валидации",
-      "Performance Testing": "Проверка времени ответа",
-      "Data Validation": "Проверка структуры и типов данных в ответах",
-      "DTO Validation": "Проверка структуры DTO классов"
-    },
-    "dtoClasses": {
-      "EndpointHitResponse": "DTO для ответа при сохранении hit",
-      "ErrorResponse": "DTO для ответов с ошибками",
-      "ViewStats": "DTO для статистики просмотров"
-    }
-  }
-} 
+	"info": {
+		"_postman_id": "131a5a78-9d18-4537-b686-9e2c356b05b8",
+		"name": "ExploreWithMe Stats Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42721807"
+	},
+	"item": [
+		{
+			"name": "Stats Service Tests",
+			"item": [
+				{
+					"name": "1. Save Hit - Valid Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.expect(pm.response.code).to.equal(201);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									"",
+									"pm.test(\"Response body is empty\", function () {",
+									"    pm.expect(pm.response.text()).to.be.empty;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Save Hit - Invalid Request (Missing App)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 for invalid request\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Response contains error message\", function () {",
+									"    const responseBody = pm.response.json();",
+									"    pm.expect(responseBody).to.have.property('message');",
+									"    pm.expect(responseBody.message).to.not.be.empty;",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2024-01-01 12:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Save Hit - Invalid Request (Invalid Timestamp)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 for invalid timestamp\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"invalid-date\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Get Stats - Basic Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 1000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+									"});",
+									"",
+									"pm.test(\"Each item has required properties\", function () {",
+									"    const response = pm.response.json();",
+									"    if (response.length > 0) {",
+									"        response.forEach(item => {",
+									"            pm.expect(item).to.have.property('app');",
+									"            pm.expect(item).to.have.property('uri');",
+									"            pm.expect(item).to.have.property('hits');",
+									"            pm.expect(item.hits).to.be.a('number');",
+									"        });",
+									"    }",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2024-01-01%2000:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2024-12-31%2023:59:59"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Get Stats - With URIs Filter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"All returned URIs match requested ones\", function () {",
+									"    const response = pm.response.json();",
+									"    const requestedUris = ['/events/1', '/events/2'];",
+									"    response.forEach(item => {",
+									"        pm.expect(requestedUris).to.include(item.uri);",
+									"    });",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&uris=%2Fevents%2F2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2024-01-01%2000:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2024-12-31%2023:59:59"
+								},
+								{
+									"key": "uris",
+									"value": "%2Fevents%2F1"
+								},
+								{
+									"key": "uris",
+									"value": "%2Fevents%2F2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Get Stats - Unique Hits",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Each item has required properties\", function () {",
+									"    const response = pm.response.json();",
+									"    if (response.length > 0) {",
+									"        response.forEach(item => {",
+									"            pm.expect(item).to.have.property('app');",
+									"            pm.expect(item).to.have.property('uri');",
+									"            pm.expect(item).to.have.property('hits');",
+									"            pm.expect(item.hits).to.be.a('number');",
+									"            pm.expect(item.hits).to.be.at.least(0);",
+									"        });",
+									"    }",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&unique=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2024-01-01%2000:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2024-12-31%2023:59:59"
+								},
+								{
+									"key": "unique",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Get Stats - Complete Flow Test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    pm.expect(pm.response.json()).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"All returned URIs match requested URI\", function () {",
+									"    const response = pm.response.json();",
+									"    response.forEach(item => {",
+									"        pm.expect(item.uri).to.equal('/events/1');",
+									"    });",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats?start=2024-01-01%2000:00:00&end=2024-12-31%2023:59:59&uris=%2Fevents%2F1&unique=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2024-01-01%2000:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2024-12-31%2023:59:59"
+								},
+								{
+									"key": "uris",
+									"value": "%2Fevents%2F1"
+								},
+								{
+									"key": "unique",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Get Stats - Invalid Date Range",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 for invalid date range\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});",
+									"",
+									"pm.test(\"Response contains ErrorResponse structure\", function () {",
+									"    const responseBody = pm.response.json();",
+									"    pm.expect(responseBody).to.have.property('message');",
+									"    pm.expect(responseBody).to.have.property('timestamp');",
+									"    pm.expect(responseBody).to.have.property('status');",
+									"    pm.expect(responseBody.message).to.equal('Start date must be before end date');",
+									"    pm.expect(responseBody.status).to.equal(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats?start=2024-12-31%2023:59:59&end=2024-01-01%2000:00:00",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2024-12-31%2023:59:59"
+								},
+								{
+									"key": "end",
+									"value": "2024-01-01%2000:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. Get Stats - Missing Required Parameters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400 for missing parameters\", function () {",
+									"    pm.expect(pm.response.code).to.equal(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "10. Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"pm.test(\"Health check response structure\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('status');",
+									"    pm.expect(response.status).to.be.oneOf(['UP', 'DOWN']);",
+									"});",
+									"",
+									"pm.test(\"Service is UP\", function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.status).to.equal('UP');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Main Service Tests",
+			"item": [
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "1. Add Category - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {pm.expect(pm.response.code).to.equal(201);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('id');",
+											"pm.expect(json).to.have.property('name');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Концерты\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/categories",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Get Categories - Basic",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+											"pm.expect(pm.response.json()).to.be.an('array');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Get Category by ID - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {pm.expect(pm.response.code).to.equal(200);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('id');",
+											"pm.expect(json).to.have.property('name');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "4. Get Category by ID - Not Found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {pm.expect(pm.response.code).to.equal(404);});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('message');"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/categories/99999",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"categories",
+										"99999"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Compilations",
+					"item": [
+						{
+							"name": "1. Add Compilation - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.test(\"Response has id and title\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('title');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Летние концерты\",\n  \"events\": [1,2],\n  \"pinned\": false\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/compilations",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"compilations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Get Compilations - Basic",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('array');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/compilations",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"compilations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Get Compilation by ID - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response has id and title\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('title');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/compilations/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"compilations",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "7. Update Compilation - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response has id and title\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('title');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Обновленная подборка\",\n  \"pinned\": true\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/compilations/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"compilations",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "5. Delete Compilation - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 204\", function () {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/compilations/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"compilations",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "4. Get Compilation by ID - Not Found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});",
+											"pm.test(\"Response contains error message\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('message');",
+											"    pm.expect(json.message).to.not.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/compilations/99999",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"compilations",
+										"99999"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "6. Delete Compilation - Not Found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});",
+											"pm.test(\"Response contains error message\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('message');",
+											"    pm.expect(json.message).to.not.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/compilations/99999",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"compilations",
+										"99999"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "8. Update Compilation - Not Found",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});",
+											"pm.test(\"Response contains error message\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('message');",
+											"    pm.expect(json.message).to.not.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Обновленная подборка\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/compilations/99999",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"compilations",
+										"99999"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "1. Add User - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.test(\"Response has id, name, email\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('name');",
+											"    pm.expect(json).to.have.property('email');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Иван Петров\",\n  \"email\": \"ivan.petrov@mail.ru\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/users",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Get Users - Basic",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('array');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/users",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Add User (2)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.test(\"Response has id, name, email\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('name');",
+											"    pm.expect(json).to.have.property('email');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Петр Иванов\",\n  \"email\": \"petr.ivanov@mail.ru\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/users",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Events",
+					"item": [
+						{
+							"name": "1. Get Events (Public) - Basic",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('array');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/events",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Event",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let json = pm.response.json();",
+											"pm.environment.set(\"eventId\", json.id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Тестовый ивент\",\n  \"annotation\": \"Краткое описание тестового ивента\",\n  \"description\": \"Подробное описание тестового ивента\",\n  \"category\": 1,\n  \"location\": {\n    \"lat\": 55.75,\n    \"lon\": 37.61\n  },\n  \"eventDate\": \"2025-12-12 12:00:00\",\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": false\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish Event (Admin)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"stateAction\": \"PUBLISH_EVENT\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/events/{{eventId}}",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"events",
+										"{{eventId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Get Event by ID (Public) - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response has id and title\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('title');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/events/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"events",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Participation Requests",
+					"item": [
+						{
+							"name": "1. Add Participation Request - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.expect(pm.response.code).to.equal(201);",
+											"});",
+											"pm.test(\"Response has id and status\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('id');",
+											"    pm.expect(json).to.have.property('status');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/2/requests?eventId=1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"2",
+										"requests"
+									],
+									"query": [
+										{
+											"key": "eventId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Get Participation Requests - Basic",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('array');",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/requests",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"requests"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Add Participation Request - Invalid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 409\", function () {",
+											"    pm.expect(pm.response.code).to.equal(409);",
+											"});",
+											"const json = pm.response.json();",
+											"pm.expect(json).to.have.property('message');"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/requests?eventId=1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"requests"
+									],
+									"query": [
+										{
+											"key": "eventId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"console.log('Starting request to: ' + pm.request.url);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Response time is reasonable\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(5000);",
+					"});",
+					"",
+					"pm.test(\"Response has valid JSON\", function () {",
+					"    if (pm.response.headers.get(\"Content-Type\") && pm.response.headers.get(\"Content-Type\").includes(\"application/json\")) {",
+					"        pm.expect(() => pm.response.json()).to.not.throw();",
+					"    }",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9090"
+		},
+		{
+			"key": "mainServiceUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

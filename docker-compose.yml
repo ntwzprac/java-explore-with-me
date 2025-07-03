@@ -21,12 +21,28 @@ services:
     volumes:
       - stats_data:/var/lib/postgresql/data
 
-  # ewm-service:
-  #   ports:
-  #     - "8080:8080"
+  ewm-service:
+    build: ./ewm-main-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - ewm-db
 
-  # ewm-db:
-  #   image: postgres:16.1
+  ewm-db:
+    image: postgres:16.1
+    environment:
+      - POSTGRES_DB=ewm
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ewm_data:/var/lib/postgresql/data
 
 volumes:
   stats_data:
+  ewm_data:
