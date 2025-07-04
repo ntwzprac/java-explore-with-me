@@ -44,5 +44,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                    @Param("rangeEnd") LocalDateTime rangeEnd,
                                    Pageable pageable);
 
+    @Query(value = "SELECT * FROM events e WHERE e.state = 'PUBLISHED'", nativeQuery = true)
+    Page<Event> searchEventsPublic(Pageable pageable);
+
     boolean existsByCategory_Id(Long categoryId);
 }

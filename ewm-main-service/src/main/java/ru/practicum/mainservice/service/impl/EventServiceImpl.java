@@ -192,6 +192,27 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public List<EventShortDto> getEventsPublic(String text, List<Long> categories, Boolean paid, String rangeStart, String rangeEnd, Boolean onlyAvailable, String sort, int from, int size) {
         PageRequest pageRequest = PageRequest.of(from / size, size);
+        saveStatsHit();
+
+        if ((text == null || text.isBlank()) &&
+                (categories == null || categories.isEmpty()) &&
+                paid == null &&
+                rangeStart == null &&
+                rangeEnd == null) {
+
+            Page<Event> eventsPage = eventRepository.searchEventsPublic(pageRequest);
+            List<Event> resultEvents = new ArrayList<>(eventsPage.getContent());
+
+            if (onlyAvailable != null && onlyAvailable) {
+                resultEvents = resultEvents.stream()
+                        .filter(event -> event.getParticipantLimit() == 0 ||
+                                event.getParticipantLimit() > event.getConfirmedRequests())
+                        .collect(Collectors.toList());
+            }
+
+            return processEventsWithStats(resultEvents, sort);
+        }
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = (rangeStart != null) ? parseDate(rangeStart) : now;
         LocalDateTime end = (rangeEnd != null) ? parseDate(rangeEnd) : LocalDateTime.of(3000, 1, 1, 0, 0);
@@ -201,8 +222,6 @@ public class EventServiceImpl implements EventService {
 
         String safeText = (text == null || text.isBlank()) ? null : text.toLowerCase();
         List<Long> safeCategories = (categories == null || categories.isEmpty()) ? null : categories;
-
-        saveStatsHit();
 
         Page<Event> eventsPage = eventRepository.searchEventsPublic(safeText, safeCategories, paid, start, end, pageRequest);
         List<Event> resultEvents = new ArrayList<>(eventsPage.getContent());
@@ -214,11 +233,16 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
 
-        List<String> uris = resultEvents.stream()
+        return processEventsWithStats(resultEvents, sort);
+    }
+
+    private List<EventShortDto> processEventsWithStats(List<Event> events, String sort) {
+        LocalDateTime now = LocalDateTime.now();
+        List<String> uris = events.stream()
                 .map(event -> "/events/" + event.getId())
                 .collect(Collectors.toList());
 
-        LocalDateTime statsStart = resultEvents.stream()
+        LocalDateTime statsStart = events.stream()
                 .map(Event::getPublishedOn)
                 .filter(java.util.Objects::nonNull)
                 .min(LocalDateTime::compareTo)
@@ -226,7 +250,7 @@ public class EventServiceImpl implements EventService {
 
         List<ViewStats> stats = statsClient.getStats(statsStart, now, uris, true);
 
-        resultEvents.forEach(event -> {
+        events.forEach(event -> {
             String eventUri = "/events/" + event.getId();
             stats.stream()
                     .filter(s -> s.getUri().equals(eventUri))
@@ -234,7 +258,7 @@ public class EventServiceImpl implements EventService {
                     .ifPresent(viewStats -> event.setViews(viewStats.getHits().intValue()));
         });
 
-        return sortEvents(resultEvents, sort).stream()
+        return sortEvents(events, sort).stream()
                 .map(EventMapper::toShortDto)
                 .collect(Collectors.toList());
     }
