@@ -25,6 +25,7 @@ public class EventFullDto {
     private String createdOn;
     private String publishedOn;
     private String state;
+    private Integer commentsAmount;
     private Integer confirmedRequests;
     private Integer views;
 }

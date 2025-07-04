@@ -17,6 +17,7 @@ public class EventShortDto {
     private UserShortDto initiator;
     private Boolean paid;
     private String eventDate;
+    private Integer commentsAmount;
     private Integer confirmedRequests;
     private Integer views;
 }
