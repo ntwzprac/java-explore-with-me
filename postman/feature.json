@@ -1097,39 +1097,6 @@
 					"name": "Events",
 					"item": [
 						{
-							"name": "1. Get Events (Public) - Basic",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"pm.test(\"Status code is 200\", function () {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"pm.test(\"Response is an array\", function () {",
-											"    pm.expect(pm.response.json()).to.be.an('array');",
-											"});"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{mainServiceUrl}}/events",
-									"host": [
-										"{{mainServiceUrl}}"
-									],
-									"path": [
-										"events"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Create Event",
 							"event": [
 								{
