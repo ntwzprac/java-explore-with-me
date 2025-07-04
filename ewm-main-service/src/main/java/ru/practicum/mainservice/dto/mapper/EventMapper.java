@@ -29,6 +29,7 @@ public class EventMapper {
                 .createdOn(event.getCreatedOn().format(FORMATTER))
                 .publishedOn(event.getPublishedOn() != null ? event.getPublishedOn().format(FORMATTER) : null)
                 .state(event.getState().name())
+                .commentsAmount(event.getComments() != null ? event.getComments().size() : 0)
                 .confirmedRequests(event.getConfirmedRequests())
                 .views(event.getViews())
                 .build();
@@ -44,6 +45,7 @@ public class EventMapper {
                 .initiator(UserMapper.toShortDto(event.getInitiator()))
                 .paid(event.getPaid())
                 .eventDate(event.getEventDate().format(FORMATTER))
+                .commentsAmount(event.getComments() != null ? event.getComments().size() : 0)
                 .confirmedRequests(event.getConfirmedRequests())
                 .views(event.getViews())
                 .build();

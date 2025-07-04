@@ -137,4 +137,28 @@ public class ExceptionController {
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
+
+    @ExceptionHandler(CommentMissingPermissionException.class)
+    public ResponseEntity<ApiError> handleCommentMissingPermission(CommentMissingPermissionException e) {
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message(e.getMessage())
+                .reason("User does not have permission to perform this action on the comment.")
+                .status(HttpStatus.FORBIDDEN.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(WrongCommentEventIdException.class)
+    public ResponseEntity<ApiError> handleWrongCommentEventId(WrongCommentEventIdException e) {
+        ApiError error = ApiError.builder()
+                .errors(Collections.singletonList(e.toString()))
+                .message(e.getMessage())
+                .reason("The event ID does not match the comment's event.")
+                .status(HttpStatus.BAD_REQUEST.name())
+                .timestamp(LocalDateTime.now().format(FORMATTER))
+                .build();
+        return ResponseEntity.badRequest().body(error);
+    }
 }

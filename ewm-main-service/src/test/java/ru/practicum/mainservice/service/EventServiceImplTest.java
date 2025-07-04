@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.mainservice.dto.request.NewEventDto;
 import ru.practicum.mainservice.dto.request.UpdateEventAdminRequest;
 import ru.practicum.mainservice.dto.request.UpdateEventUserRequest;
@@ -25,12 +26,13 @@ import ru.practicum.mainservice.repository.UserRepository;
 import ru.practicum.mainservice.service.impl.EventServiceImpl;
 import ru.practicum.statsclient.StatsClient;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +71,17 @@ class EventServiceImplTest {
 
     @Test
     void testGetEventsAdmin_Empty() {
-        when(eventRepository.searchEventsAdmin(any(), any(), any(), any(), any(), any())).thenReturn(Page.empty());
+        PageImpl<Event> emptyPage = new PageImpl<>(new ArrayList<>());
+
+        when(eventRepository.searchEventsAdmin(
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)))
+                .thenReturn(emptyPage);
+
         List<EventFullDto> result = eventService.getEventsAdmin(null, null, null, null, null, 0, 10);
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -120,9 +132,30 @@ class EventServiceImplTest {
 
     @Test
     void testGetEventsPublic_Empty() {
-        when(eventRepository.searchEventsPublic(any(), any(), any(), any(), any(), any())).thenReturn(Page.empty());
+        // Мокируем оба метода searchEventsPublic с использованием PageImpl
+        PageImpl<Event> emptyPage = new PageImpl<>(new ArrayList<>());
+
+        when(eventRepository.searchEventsPublic(any(Pageable.class)))
+                .thenReturn(emptyPage);
+
+        when(eventRepository.searchEventsPublic(
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                any(Pageable.class)))
+                .thenReturn(emptyPage);
+
         when(httpServletRequest.getRequestURI()).thenReturn("/events");
         when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(statsClient.getStats(
+                any(LocalDateTime.class),
+                any(LocalDateTime.class),
+                anyList(),
+                anyBoolean()))
+                .thenReturn(new ArrayList<>());
+
         List<EventShortDto> result = eventService.getEventsPublic(null, null, null, null, null, null, null, 0, 10);
         assertNotNull(result);
         assertTrue(result.isEmpty());
