@@ -1,8 +1,10 @@
 package ru.practicum.mainservice.dto.response;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ApiErrorTest {
     @Test
