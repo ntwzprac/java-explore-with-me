@@ -105,4 +105,4 @@ class UserEventCommentControllerTest {
         mockMvc.perform(delete("/users/{userId}/events/{eventId}/comments/{commentId}", userId, eventId, commentId))
                 .andExpect(status().isNoContent());
     }
-} 
+}

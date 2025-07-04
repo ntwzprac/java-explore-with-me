@@ -82,4 +82,4 @@ class EventCommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(comment)));
     }
-} 
+}

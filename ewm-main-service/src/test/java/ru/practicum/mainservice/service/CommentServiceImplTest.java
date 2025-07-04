@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import ru.practicum.mainservice.dto.request.CommentDto;
 import ru.practicum.mainservice.dto.response.CommentViewDto;
 import ru.practicum.mainservice.exception.CommentMissingPermissionException;
@@ -171,4 +170,4 @@ class CommentServiceImplTest {
 
         verify(commentRepository).delete(comment);
     }
-} 
+}

@@ -37,4 +37,4 @@ class AdminEventCommentControllerTest {
 
         verify(commentService).deleteCommentAdmin(eventId, commentId);
     }
-} 
+}
