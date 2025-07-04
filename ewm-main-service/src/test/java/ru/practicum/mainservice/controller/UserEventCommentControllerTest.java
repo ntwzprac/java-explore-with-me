@@ -59,7 +59,7 @@ class UserEventCommentControllerTest {
         mockMvc.perform(post("/users/{userId}/events/{eventId}/comments", userId, eventId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(commentDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(mapper.writeValueAsString(expectedResponse)));
     }
 

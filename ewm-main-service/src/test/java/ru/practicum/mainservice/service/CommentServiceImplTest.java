@@ -14,6 +14,7 @@ import ru.practicum.mainservice.exception.CommentMissingPermissionException;
 import ru.practicum.mainservice.exception.NotFoundException;
 import ru.practicum.mainservice.model.Comment;
 import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.model.EventState;
 import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.CommentRepository;
 import ru.practicum.mainservice.repository.EventRepository;
@@ -58,6 +59,7 @@ class CommentServiceImplTest {
 
         event = new Event();
         event.setId(1L);
+        event.setState(EventState.PUBLISHED);
 
         comment = new Comment();
         comment.setId(1L);
@@ -83,6 +85,18 @@ class CommentServiceImplTest {
         assertEquals(comment.getText(), result.getText());
         assertEquals(user.getName(), result.getAuthor().getName());
         verify(commentRepository).save(any(Comment.class));
+    }
+
+    @Test
+    void addComment_ShouldThrowNotFoundException_WhenEventNotPublished() {
+        event.setState(EventState.PENDING);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
+
+        assertThrows(NotFoundException.class,
+                () -> commentService.addComment(user.getId(), event.getId(), commentDto));
+
+        verify(commentRepository, never()).save(any(Comment.class));
     }
 
     @Test
@@ -130,7 +144,6 @@ class CommentServiceImplTest {
         int size = 10;
         PageRequest pageRequest = PageRequest.of(from / size, size);
 
-        when(eventRepository.findById(event.getId())).thenReturn(Optional.of(event));
         when(commentRepository.findByEventIdOrderByUpdateTimeOrCreateTime(eq(event.getId()), any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(List.of(comment)));
 
