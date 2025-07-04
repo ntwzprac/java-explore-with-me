@@ -13,7 +13,7 @@ public class CommentMapper {
                 .id(comment.getId())
                 .text(comment.getText())
                 .createdOn(comment.getCreatedOn().format(FORMATTER))
-                .updatedOn(comment.getUpdatedOn().format(FORMATTER))
+                .updatedOn(comment.getUpdatedOn() != null ? comment.getUpdatedOn().format(FORMATTER) : null)
                 .author(UserMapper.toShortDto(comment.getAuthor()))
                 .build();
     }
