@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "131a5a78-9d18-4537-b686-9e2c356b05b8",
-		"name": "ExploreWithMe Stats Service",
+		"_postman_id": "76722a13-312d-4d29-91ac-ab82bab20a12",
+		"name": "ExploreWithMe Postman Тесты",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42721807"
 	},
@@ -1368,6 +1368,590 @@
 											"key": "eventId",
 											"value": "1"
 										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Comments",
+					"item": [
+						{
+							"name": "Create Event",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let json = pm.response.json();",
+											"pm.environment.set(\"eventId2\", json.id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Тестовый ивент 2\",\n  \"annotation\": \"Краткое описание тестового ивента 2\",\n  \"description\": \"Подробное описание тестового ивента 2\",\n  \"category\": 1,\n  \"location\": {\n    \"lat\": 55.75,\n    \"lon\": 37.61\n  },\n  \"eventDate\": \"2025-12-12 12:00:00\",\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": false\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish Event (Admin) Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"stateAction\": \"PUBLISH_EVENT\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/events/{{eventId2}}",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"events",
+										"{{eventId2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "1. Add Comment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"text\": \"Тестовый комментарий\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}/comments",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check current comments amount on event",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body has commentsAmount\", function () {\r",
+											"    pm.response.to.have.jsonBody('commentsAmount');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"commentsAmount equals 1\", function () {\r",
+											"    pm.expect(pm.response.json().commentsAmount).to.eql(1);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Comments List",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body is an array\", function() {\r",
+											"    pm.response.to.be.json;\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.be.an('array');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Each comment has an id, text, and author\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"    var jsonData = pm.response.json();\r",
+											"    jsonData.forEach(function (comment) {\r",
+											"        pm.expect(comment).to.have.property('id');\r",
+											"        pm.expect(comment).to.have.property('text');\r",
+											"        pm.expect(comment).to.have.property('author');\r",
+											"    });\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/events/{{eventId2}}/comments",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"events",
+										"{{eventId2}}",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Comment - Wrong User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Обновленный комментарий\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/2/events/{{eventId2}}/comments/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"2",
+										"events",
+										"{{eventId2}}",
+										"comments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. Update Comment - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"pm.test(\"Response has updated text\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json.text).to.equal(\"Обновленный комментарий\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Обновленный комментарий\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}/comments/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}",
+										"comments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Comment - Wrong User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 403\", function () {",
+											"    pm.expect(pm.response.code).to.equal(403);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/2/events/{{eventId2}}/comments/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"2",
+										"events",
+										"{{eventId2}}",
+										"comments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. Delete Comment - Valid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 204\", function () {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}/comments/1",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}",
+										"comments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check current Comments amount on event after Comment delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body has commentsAmount\", function () {\r",
+											"    pm.response.to.have.jsonBody('commentsAmount');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"commentsAmount equals 1\", function () {\r",
+											"    pm.expect(pm.response.json().commentsAmount).to.eql(0);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Comment Copy",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"text\": \"Тестовый комментарий\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/{{eventId2}}/comments",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"{{eventId2}}",
+										"comments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "4. Admin Delete Comment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 204\", function () {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{mainServiceUrl}}/admin/events/{{eventId2}}/comments/2",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"admin",
+										"events",
+										"{{eventId2}}",
+										"comments",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Event Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let json = pm.response.json();",
+											"pm.environment.set(\"eventId\", json.id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Тестовый ивент\",\n  \"annotation\": \"Краткое описание тестового ивента\",\n  \"description\": \"Подробное описание тестового ивента\",\n  \"category\": 1,\n  \"location\": {\n    \"lat\": 55.75,\n    \"lon\": 37.61\n  },\n  \"eventDate\": \"2025-12-12 12:00:00\",\n  \"paid\": false,\n  \"participantLimit\": 100,\n  \"requestModeration\": false\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "5. Add Comment to Unpublished Event",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});",
+											"",
+											"pm.test(\"Response contains error message about unpublished event\", function () {",
+											"    const json = pm.response.json();",
+											"    pm.expect(json).to.have.property('message');",
+											"    pm.expect(json.message).to.include('unpublished');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"text\": \"Комментарий к неопубликованному событию\"\n}"
+								},
+								"url": {
+									"raw": "{{mainServiceUrl}}/users/1/events/3/comments",
+									"host": [
+										"{{mainServiceUrl}}"
+									],
+									"path": [
+										"users",
+										"1",
+										"events",
+										"3",
+										"comments"
 									]
 								}
 							},
