@@ -1203,13 +1203,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{mainServiceUrl}}/events/1",
+									"raw": "{{mainServiceUrl}}/events/{{eventId}}",
 									"host": [
 										"{{mainServiceUrl}}"
 									],
 									"path": [
 										"events",
-										"1"
+										"{{eventId}}"
 									]
 								}
 							},
@@ -1245,7 +1245,7 @@
 								"method": "POST",
 								"header": [],
 								"url": {
-									"raw": "{{mainServiceUrl}}/users/2/requests?eventId=1",
+									"raw": "{{mainServiceUrl}}/users/2/requests?eventId={{eventId}}",
 									"host": [
 										"{{mainServiceUrl}}"
 									],
@@ -1257,7 +1257,7 @@
 									"query": [
 										{
 											"key": "eventId",
-											"value": "1"
+											"value": "{{eventId}}"
 										}
 									]
 								}
