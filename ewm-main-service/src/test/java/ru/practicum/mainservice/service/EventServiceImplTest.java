@@ -16,7 +16,10 @@ import ru.practicum.mainservice.dto.response.EventShortDto;
 import ru.practicum.mainservice.exception.ConflictException;
 import ru.practicum.mainservice.exception.InvalidDateException;
 import ru.practicum.mainservice.exception.NotFoundException;
-import ru.practicum.mainservice.model.*;
+import ru.practicum.mainservice.model.Category;
+import ru.practicum.mainservice.model.Event;
+import ru.practicum.mainservice.model.EventState;
+import ru.practicum.mainservice.model.User;
 import ru.practicum.mainservice.repository.CategoryRepository;
 import ru.practicum.mainservice.repository.EventRepository;
 import ru.practicum.mainservice.repository.UserRepository;
@@ -69,7 +72,7 @@ class EventServiceImplTest {
     @Test
     void testGetEventsAdmin_Empty() {
         PageImpl<Event> emptyPage = new PageImpl<>(new ArrayList<>());
-        
+
         when(eventRepository.searchEventsAdmin(
                 isNull(),
                 isNull(),
@@ -131,10 +134,10 @@ class EventServiceImplTest {
     void testGetEventsPublic_Empty() {
         // Мокируем оба метода searchEventsPublic с использованием PageImpl
         PageImpl<Event> emptyPage = new PageImpl<>(new ArrayList<>());
-        
+
         when(eventRepository.searchEventsPublic(any(Pageable.class)))
                 .thenReturn(emptyPage);
-                
+
         when(eventRepository.searchEventsPublic(
                 isNull(),
                 isNull(),
@@ -143,7 +146,7 @@ class EventServiceImplTest {
                 isNull(),
                 any(Pageable.class)))
                 .thenReturn(emptyPage);
-        
+
         when(httpServletRequest.getRequestURI()).thenReturn("/events");
         when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
         when(statsClient.getStats(
@@ -152,7 +155,7 @@ class EventServiceImplTest {
                 anyList(),
                 anyBoolean()))
                 .thenReturn(new ArrayList<>());
-        
+
         List<EventShortDto> result = eventService.getEventsPublic(null, null, null, null, null, null, null, 0, 10);
         assertNotNull(result);
         assertTrue(result.isEmpty());
